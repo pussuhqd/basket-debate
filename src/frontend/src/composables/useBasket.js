@@ -39,7 +39,7 @@ export function useBasket() {
     basket.value = []
 
     try {
-      const response = await fetch('/api/optimize', {
+      const response = await fetch('api/optimize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -53,9 +53,11 @@ export function useBasket() {
         throw new Error(`Server error ${response.status}`)
       }
 
-      const data = await response.json()
-      basket.value = data.basket || []
-      originalPrice.value = data.original_price || totalPrice.value * 1.2
+    const data = await response.json()
+
+    basket.value = data.basket || []
+    originalPrice.value = data.summary?.original_price || 0
+
     } catch (err) {
       error.value = `❌ Ошибка: ${err.message}`
     } finally {

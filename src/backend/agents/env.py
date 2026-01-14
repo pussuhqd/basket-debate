@@ -47,7 +47,6 @@ class BasketEnv(ParallelEnv):
         
         obs_dict = {}
         for agent in self.agents:
-            # ✅ Используем self._budget
             obs_array = np.array(
                 [self._budget, 0.0] + [0.0] * 10,
                 dtype=np.float32

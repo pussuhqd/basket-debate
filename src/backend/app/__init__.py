@@ -1,9 +1,22 @@
-from flask import Flask, current_app, jsonify
+from flask import Flask, current_app, jsonify, request
 import sqlite3
 import os
 from src.backend.db.models import init_db
 from src.backend.agents.env import create_basket_env
 from flask_cors import CORS
+import numpy as np
+
+def to_jsonable(x):
+    if isinstance(x, np.generic):
+        return x.item()
+    if isinstance(x, np.ndarray):
+        return x.tolist()
+    if isinstance(x, dict):
+        return {k: to_jsonable(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [to_jsonable(v) for v in x]
+    return x
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -50,48 +63,68 @@ def create_app():
                 for row in c.fetchall()
             ]
         return jsonify(products)
-    
-    @app.route('/simulate')
+    @app.route('/optimize', methods=['POST']) 
     def simulate_basket():
-        """Симуляция MAS: 3 агента оптимизируют корзину за 5 шагов."""
         try:
-            env = create_basket_env(budget=1500.0, max_steps=5)
+            data = request.get_json() or {}
+            budget = float(data.get('budget', 1500))
+            max_steps = int(data.get('max_steps', 5))
+            
+            env = create_basket_env(budget=budget, max_steps=max_steps)
             obs, infos = env.reset(seed=42)
             
             total_rewards = {agent: 0.0 for agent in env.possible_agents}
-            episode_log = []
             
             while env.agents:
-                actions = {
-                    agent: env.action_space(agent).sample() 
-                    for agent in env.agents
-                }
+                actions = {agent: env.action_space(agent).sample() for agent in env.agents}
                 obs, rewards, terms, truncs, infos = env.step(actions)
                 
                 for agent in rewards:
                     total_rewards[agent] += rewards[agent]
-                
-                episode_log.append({
-                    "step": env.steps,
-                    "cart_sum": round(env.current_sum, 2),
-                    "rewards": {k: round(float(v), 3) for k, v in rewards.items()}
-                })
             
             env.close()
             
-            return jsonify({
+            agent_cycle = ["budget", "compatibility", "profile"]
+
+            basket = []
+            for i, price in enumerate(env.cart):
+                agent = agent_cycle[i % len(agent_cycle)]
+                basket.append({
+                    "id": i + 1,
+                    "name": f"Товар {i + 1}",
+                    "price": float(price),
+                    "agent": agent,
+                    "reason": f"Выбран агентом: {agent}",
+                    "rating": 4.5
+                })
+
+            total_price = float(round(env.current_sum, 2))
+            items_count = int(len(env.cart))
+            original_price = float(round(total_price * 1.2, 2))
+            savings = float(round(original_price - total_price, 2))
+
+            payload = {
                 "status": "success",
-                "final_sum": round(env.current_sum, 2),
-                "cart_size": len(env.cart),
-                "total_rewards": {k: round(v, 3) for k, v in total_rewards.items()},
-                "steps": len(episode_log)
-            })
-        
+                "basket": basket,
+                "summary": {
+                    "items_count": items_count,
+                    "total_price": total_price,
+                    "original_price": original_price,
+                    "savings": savings,
+                    "rewards": {k: float(round(v, 3)) for k, v in total_rewards.items()}
+                }
+            }
+
+            return jsonify(to_jsonable(payload))
+
         except Exception as e:
-            return jsonify({
-                "status": "error",
-                "message": str(e),
-                "error_type": type(e).__name__
-            }), 500
-    
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+
+    @app.route('/optimize', methods=['POST'])
+    def optimize_basket():
+        """Совместимость с фронтендом — перенаправляет на /simulate."""
+        return simulate_basket()
+
+
     return app
