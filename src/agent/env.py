@@ -136,19 +136,54 @@ class BasketEnv(ParallelEnv):
         self.steps += 1
         
         # === РАСЧЁТ НАГРАД (Reward Function) ===
+        rewards = {agent: 0.0 for agent in self.agents}
+
+        # 1. BUDGET AGENT
         budget_diff = abs(self.current_sum - self._budget)
-        
-        rewards = {
-            # Budget Agent: штраф за отклонение от бюджета
-            "budget_agent": -budget_diff / 100,
+        budget_ratio = self.current_sum / self._budget if self._budget > 0 else 0
+
+        # Штраф за отклонение от бюджета
+        rewards["budget_agent"] -= budget_diff / self._budget
+
+        # Бонус за близость к целевому бюджету (90%-100% = идеально)
+        if 0.9 <= budget_ratio <= 1.0:
+            rewards["budget_agent"] += 5.0  # Сильный бонус за точность
+
+        # 2. COMPATIBILITY AGENT
+        if len(self.cart) > 1:
+            # Считаем уникальные категории товаров
+            categories = [self.products[idx]["product_category"] for idx in self.cart]
+            unique_categories = len(set(categories))
+            diversity_ratio = unique_categories / len(self.cart)
             
-            # Compatibility Agent: бонус за разнообразие корзины
-            "compat_agent": len(self.cart) * 0.2 if len(self.cart) > 1 else 0,
+            # Бонус за разнообразие
+            rewards["compat_agent"] += diversity_ratio * 3.0
             
-            # Profile Agent: бонус за наличие товаров
-            "profile_agent": 0.5 if self.cart else 0
-        }
-        
+            # ЖЁСТКИЙ ШТРАФ за однообразие (например, 10 товаров воды)
+            if unique_categories == 1 and len(self.cart) >= 3:
+                rewards["compat_agent"] -= 10.0  # Все товары из одной категории!
+            
+            # НОВОЕ: Штраф за слишком много одинаковых товаров
+            from collections import Counter
+            product_counts = Counter(self.cart)
+            for product_idx, count in product_counts.items():
+                if count > 2:  # Один товар больше 2 раз
+                    rewards["compat_agent"] -= 3.0 * (count - 2)  # -3 за каждый лишний
+
+
+                # 3. PROFILE AGENT
+                for idx in self.cart:
+                    product = self.products[idx]
+                    product_tags = set(product["tags"])
+                    
+                    # ЖЁСТКИЙ ШТРАФ за нарушение exclude_tags
+                    if product_tags & set(self.exclude_tags):  # Пересечение множеств
+                        rewards["profile_agent"] -= 5.0  # За каждый запрещённый товар
+                    
+                    # Бонус за соответствие include_tags
+                    if self.include_tags and product_tags & set(self.include_tags):
+                        rewards["profile_agent"] += 2.0
+                
         # Обновляем накопленные награды
         for agent, r in rewards.items():
             self._cumulative_rewards[agent] += r

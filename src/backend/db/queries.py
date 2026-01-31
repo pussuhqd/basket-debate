@@ -34,16 +34,18 @@ def fetch_candidate_products(
     people = constraints.get("people", 1)
     
     # Расчёт максимальной цены за единицу (чтобы не брать слишком дорогие товары)
+    min_price = budget * 0.02
     max_price = budget * max_price_ratio
     
     # Строим SQL-запрос
     query = """
         SELECT id, product_name, product_category, brand, 
-               package_size, unit, price_per_unit, tags
+            package_size, unit, price_per_unit, tags
         FROM products
-        WHERE price_per_unit <= ?
+        WHERE price_per_unit >= ?  
+        AND price_per_unit <= ?
     """
-    params = [max_price]
+    params = [min_price, max_price]  # НОВОЕ: два параметра
     
     # Фильтрация по exclude_tags (исключаем товары с этими тегами)
     for tag in exclude_tags:
