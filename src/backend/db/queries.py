@@ -28,8 +28,8 @@ def fetch_candidate_products(
         List[Dict]: список товаров с полями id, product_name, price_per_unit, tags
     """
     
-    budget = constraints.get("budget_rub", 5000)
-    exclude_tags = constraints.get("exclude_tags", [])
+    budget = constraints.get("budget_rub") or 5000  
+    exclude_tags = constraints.get("exclude_tags") or []  
     include_tags = constraints.get("include_tags", [])
     people = constraints.get("people", 1)
     

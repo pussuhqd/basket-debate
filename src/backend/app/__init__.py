@@ -6,6 +6,7 @@ from src.agent import create_basket_env
 from flask_cors import CORS
 import numpy as np
 from src.nlp.llm_parser import parse_query_with_function_calling
+from src.backend.db.queries import fetch_candidate_products  
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -137,24 +138,29 @@ def create_app():
             # 1. Парсим запрос через LLM
             constraints = parse_query_with_function_calling(user_query)
             print(f"[INFO] Parsed constraints: {constraints}")
-            
-            # 2. Извлекаем параметры
-            budget = constraints.get('budget_rub') or 1500
-            exclude_tags = constraints.get('exclude_tags', [])
-            include_tags = constraints.get('include_tags', [])
-            meal_type = constraints.get('meal_type', [])
-            people = constraints.get('people') or 1
-            
-            # 3. Создаём окружение (ТЕПЕРЬ РАБОТАЕТ!)
+            if constraints.get("budget_rub") is None:
+                constraints["budget_rub"] = 3000
+                print(f"[WARN] budget_rub was None, using default 1500")
+
+            # 2. Фильтруем товары из БД
+            products = fetch_candidate_products(constraints, limit=100)
+            print(f"[INFO] Found {len(products)} candidate products")
+
+            # Проверка: если товаров не найдено → ошибка
+            if not products:
+                return jsonify({
+                    "status": "error",
+                    "message": "No products found matching constraints",
+                    "constraints": constraints
+                }), 404
+
+            # 3. Создаём окружение с реальными товарами
             env = create_basket_env(
-                budget=budget,
-                max_steps=10,
-                exclude_tags=exclude_tags,
-                include_tags=include_tags,
-                meal_type=meal_type,
-                people=people
+                products=products,
+                constraints=constraints,
+                max_steps=10
             )
-            
+
             # 4. Запускаем агентов
             obs, infos = env.reset(seed=42)
             total_rewards = {agent: 0.0 for agent in env.possible_agents}
@@ -168,15 +174,20 @@ def create_app():
             
             env.close()
             
-            # 5. Формируем корзину
+            # 5. Формируем корзину с РЕАЛЬНЫМИ товарами
             agent_cycle = ["budget", "compatibility", "profile"]
             basket = []
-            for i, price in enumerate(env.cart):
+            for i, product_idx in enumerate(env.cart):  # Теперь cart содержит ИНДЕКСЫ, а не цены
+                product = products[product_idx]  # Достаём товар из списка
                 agent = agent_cycle[i % len(agent_cycle)]
                 basket.append({
-                    "id": i + 1,
-                    "name": f"Товар {i + 1}",
-                    "price": float(price),
+                    "id": product["id"],  # Реальный ID из БД
+                    "name": product["product_name"],  # Реальное название
+                    "category": product["product_category"],  # Категория
+                    "brand": product["brand"],  # Бренд
+                    "price": float(product["price_per_unit"]),  # Реальная цена
+                    "unit": product["unit"],  # Единица измерения (кг/л/шт)
+                    "tags": product["tags"],  # Теги
                     "agent": agent,
                     "reason": f"Выбран агентом: {agent}",
                     "rating": 4.5

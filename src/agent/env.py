@@ -17,12 +17,9 @@ class BasketEnv(ParallelEnv):
     
     def __init__(
         self, 
-        budget=1500.0, 
-        max_steps=10,
-        exclude_tags=None,
-        include_tags=None,
-        meal_type=None,
-        people=1
+        products,  
+        constraints,  
+        max_steps=10
     ):
         """
         Args:
@@ -35,16 +32,17 @@ class BasketEnv(ParallelEnv):
         """
         super().__init__()
         
-        # Базовые параметры
-        self._budget = float(budget)
+        self.products = products  
+        self.constraints = constraints  
         self._max_steps = int(max_steps)
-        
-        # Constraints от LLM (пока не используются в логике, но сохранены)
-        self.exclude_tags = exclude_tags or []
-        self.include_tags = include_tags or []
-        self.meal_type = meal_type or []
-        self.people = people
-        
+
+        # Извлекаем параметры из constraints
+        self._budget = float(constraints.get("budget_rub", 1500))
+        self.exclude_tags = constraints.get("exclude_tags", [])
+        self.include_tags = constraints.get("include_tags", [])
+        self.meal_type = constraints.get("meal_type", [])
+        self.people = constraints.get("people", 1)
+
         # Агенты
         self.possible_agents = ["budget_agent", "compat_agent", "profile_agent"]
         self.agents = self.possible_agents.copy()
@@ -54,8 +52,10 @@ class BasketEnv(ParallelEnv):
             agent: spaces.Box(low=0, high=2000, shape=(12,), dtype=np.float32) 
             for agent in self.possible_agents
         }
+
+        num_actions = len(products) + 1  # +1 для действия "skip"
         self._action_spaces = {
-            agent: spaces.Discrete(11)  # 0 = skip, 1-10 = add product with price
+            agent: spaces.Discrete(num_actions)
             for agent in self.possible_agents
         }
         
@@ -117,12 +117,21 @@ class BasketEnv(ParallelEnv):
         """
         # Обрабатываем действия агентов
         for agent, action in actions.items():
-            if action > 0:
-                # action = 1..10 → цена = 100 + action * 50 (от 150 до 600 руб)
-                # TODO: Заменить на реальные товары из БД
-                price = 100 + action * 50
-                self.cart.append(price)
-                self.current_sum += price
+            if action > 0:  # 0 = skip, 1..N = выбрать товар
+                product_idx = action - 1  # action=1 → индекс 0 (первый товар)
+                
+                # Проверяем, что индекс в пределах списка
+                if product_idx < len(self.products):
+                    product = self.products[product_idx]  # Словарь с товаром
+                    price = product["price_per_unit"]  # Реальная цена из БД
+                    
+                    # Проверяем, не превысим ли бюджет (допускаем +10%)
+                    if self.current_sum + price <= self._budget * 1.1:
+                        # Добавляем в корзину ИНДЕКС товара (не цену!)
+                        # Потом по индексу достанем полную информацию
+                        self.cart.append(product_idx)
+                        self.current_sum += price
+
         
         self.steps += 1
         
@@ -185,33 +194,20 @@ class BasketEnv(ParallelEnv):
         pass
 
 
-def create_basket_env(
-    budget=1500.0, 
-    max_steps=10,
-    exclude_tags=None,
-    include_tags=None,
-    meal_type=None,
-    people=1
-):
+def create_basket_env(products, constraints, max_steps=10):
     """
     Factory-функция для создания окружения.
     
     Args:
-        budget: Бюджет в рублях
-        max_steps: Максимальное количество шагов
-        exclude_tags: Список запрещённых тегов (например, ['dairy'])
-        include_tags: Список обязательных тегов (например, ['vegan'])
-        meal_type: Тип приёма пищи (['breakfast', 'lunch', 'dinner', 'snack'])
-        people: Количество человек
+        products: список товаров из БД (каждый = словарь)
+        constraints: словарь с параметрами запроса (budget_rub, exclude_tags, ...)
+        max_steps: количество шагов симуляции
     
     Returns:
-        BasketEnv: Инициализированное окружение
+        BasketEnv: окружение с реальными товарами
     """
     return BasketEnv(
-        budget=float(budget),
-        max_steps=int(max_steps),
-        exclude_tags=exclude_tags or [],
-        include_tags=include_tags or [],
-        meal_type=meal_type or [],
-        people=people
+        products=products,
+        constraints=constraints,
+        max_steps=int(max_steps)
     )
