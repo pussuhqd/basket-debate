@@ -7,7 +7,7 @@ from flask_cors import CORS
 import numpy as np
 from src.nlp.llm_parser import parse_query_with_function_calling
 from dotenv import load_dotenv
-
+# test
 load_dotenv()
 
 def to_jsonable(x):
