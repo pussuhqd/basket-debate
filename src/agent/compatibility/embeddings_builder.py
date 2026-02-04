@@ -1,6 +1,5 @@
 """
 Модуль для предвычисления embeddings товаров.
-
 Этот скрипт:
 1. Загружает модель SentenceTransformer
 2. Читает все товары из products.db
@@ -148,8 +147,10 @@ def save_embeddings_batch(product_ids: List[int], embeddings: np.ndarray):
     # Подготавливаем данные для batch update
     data = []
     for product_id, embedding in zip(product_ids, embeddings):
-        # Сериализуем numpy array в bytes через pickle
-        embedding_bytes = pickle.dumps(embedding, protocol=pickle.HIGHEST_PROTOCOL)
+        # ========== ИСПРАВЛЕНИЕ: НЕ PICKLE, А TOBYTES ==========
+        # Конвертируем в float32 и сохраняем как raw bytes
+        embedding_bytes = embedding.astype(np.float32).tobytes()
+        # =======================================================
         data.append((embedding_bytes, product_id))
     
     # Batch update
@@ -161,6 +162,7 @@ def save_embeddings_batch(product_ids: List[int], embeddings: np.ndarray):
     
     conn.commit()
     conn.close()
+
 
 
 # ==================== ГЛАВНАЯ ФУНКЦИЯ ====================
@@ -252,12 +254,8 @@ def build_embeddings():
 # ==================== ТЕСТИРОВАНИЕ ====================
 
 def test_embeddings(num_samples: int = 5):
-    """
-    Тестирует, что embeddings корректно сохранены.
+    """Тестирует, что embeddings корректно сохранены."""
     
-    Args:
-        num_samples: Количество товаров для проверки
-    """
     print("\n🧪 Тестирование embeddings...")
     
     conn = sqlite3.connect(DB_PATH)
@@ -280,34 +278,49 @@ def test_embeddings(num_samples: int = 5):
     print(f"   ✅ Найдено {len(samples)} товаров с embeddings")
     print("\nПримеры:")
     
-    for product_id, name, category, embedding_bytes in samples:
-        # Десериализуем embedding
-        embedding = pickle.loads(embedding_bytes)
-        
-        print(f"\n   ID {product_id}: {name}")
-        print(f"   Категория: {category}")
-        print(f"   Embedding shape: {embedding.shape}")
-        print(f"   Первые 5 значений: {embedding[:5]}")
-        print(f"   L2 norm: {np.linalg.norm(embedding):.4f}")
+    for product_id, name, category, embedding_blob in samples:
+        # ========== ИСПРАВЛЕНИЕ: FROMBUFFER вместо PICKLE ==========
+        try:
+            embedding = np.frombuffer(embedding_blob, dtype=np.float32)
+            
+            # Проверяем валидность
+            if len(embedding) == 0:
+                print(f"   ❌ ID {product_id}: Пустой embedding!")
+                continue
+            
+            if not np.isfinite(embedding).all():
+                print(f"   ❌ ID {product_id}: NaN/Inf в embedding!")
+                continue
+            
+            print(f"\n   ✅ ID {product_id}: {name[:50]}")
+            print(f"      Категория: {category}")
+            print(f"      Размер: {len(embedding)} dims")
+            print(f"      Первые 5: {embedding[:5]}")
+            print(f"      L2 norm: {np.linalg.norm(embedding):.4f}")
+            
+        except Exception as e:
+            print(f"   ❌ ID {product_id}: Ошибка декодирования - {e}")
+        # ===========================================================
     
-    # Проверяем количество товаров с embeddings
+    # Статистика
     cursor.execute("SELECT COUNT(*) FROM products WHERE embedding IS NOT NULL")
-    count_with_embeddings = cursor.fetchone()[0]
+    count_with = cursor.fetchone()[0]
     
     cursor.execute("SELECT COUNT(*) FROM products")
-    total_count = cursor.fetchone()[0]
+    total = cursor.fetchone()[0]
     
     print(f"\n📊 Статистика:")
-    print(f"   Всего товаров: {total_count:,}")
-    print(f"   С embeddings: {count_with_embeddings:,}")
-    print(f"   Без embeddings: {total_count - count_with_embeddings:,}")
+    print(f"   Всего товаров: {total:,}")
+    print(f"   С embeddings: {count_with:,}")
+    print(f"   Без embeddings: {total - count_with:,}")
     
-    if count_with_embeddings == total_count:
+    if count_with == total:
         print("   ✅ Все товары обработаны!")
     else:
-        print(f"   ⚠️  {total_count - count_with_embeddings} товаров без embeddings")
+        print(f"   ⚠️  {total - count_with} товаров без embeddings")
     
     conn.close()
+
 
 
 # ==================== MAIN ====================

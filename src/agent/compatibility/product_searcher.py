@@ -130,7 +130,7 @@ class ProductSearcher:
         products = []
         for row in rows:
             # Десериализуем embedding
-            embedding = pickle.loads(row["embedding"])
+            embedding = np.frombuffer(row["embedding"], dtype=np.float32)
             
             products.append({
                 "id": row["id"],

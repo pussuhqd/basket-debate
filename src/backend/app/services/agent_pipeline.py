@@ -7,6 +7,7 @@ import time
 
 from src.agent.compatibility.agent import CompatibilityAgent
 from src.nlp.llm_parser import parse_query_with_function_calling
+from src.agent.budget.agent import BudgetAgent
 
 
 class AgentPipeline:
@@ -18,7 +19,7 @@ class AgentPipeline:
         """Инициализирует агентов."""
         print("🤖 Инициализация агентов...")
         self.compatibility_agent = CompatibilityAgent()
-        self.budget_agent = None  # TODO
+        self.budget_agent = BudgetAgent()  
         self.profile_agent = None  # TODO
     
     
@@ -120,13 +121,18 @@ class AgentPipeline:
             basket_current = basket_v1_formatted
             
             # ============================================
-            # ЭТАП 3: BUDGET AGENT (заглушка)
+            # ЭТАП 3: BUDGET AGENT
             # ============================================
             stage3_start = time.time()
-            
-            # TODO: Реальный BudgetAgent
-            basket_v2 = basket_current  # Пока без изменений
-            
+
+            budget_result = self.budget_agent.optimize(
+                basket=basket_v1_formatted,
+                budget_rub=parsed_query.get('budget_rub'),
+                min_discount=0.2
+            )
+
+            basket_v2 = budget_result['basket']
+
             stages.append({
                 'agent': 'budget',
                 'name': '💰 Budget Agent',
@@ -134,10 +140,16 @@ class AgentPipeline:
                 'duration': round(time.time() - stage3_start, 2),
                 'result': {
                     'basket': basket_v2,
-                    'optimized': False,
-                    'message': 'В разработке'
+                    'saved': budget_result['saved'],
+                    'replacements': budget_result['replacements'],
+                    'within_budget': budget_result['within_budget'],
+                    'optimized': len(budget_result['replacements']) > 0
                 }
             })
+
+            basket_current = basket_v2
+
+        
             
             basket_current = basket_v2
             
