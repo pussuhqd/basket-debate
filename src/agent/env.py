@@ -123,136 +123,140 @@ class BasketEnv(ParallelEnv):
                 
                 # Проверяем, что индекс в пределах списка
                 if product_idx < len(self.products):
-                    product = self.products[product_idx]  # Словарь с товаром
-                    price = product["price_per_unit"]  # Реальная цена из БД
+                    product = self.products[product_idx]
+                    price = product["price_per_unit"]
                     
                     # Проверяем, не превысим ли бюджет (допускаем +10%)
                     if self.current_sum + price <= self._budget * 1.1:
-                        # Добавляем в корзину ИНДЕКС товара (не цену!)
-                        # Потом по индексу достанем полную информацию
                         self.cart.append(product_idx)
                         self.current_sum += price
-
         
         self.steps += 1
-
-        # === РАСЧЁТ НАГРАД (НОРМАЛИЗОВАННАЯ ВЕРСИЯ) ===
+        
+        # === РАСЧЁТ НАГРАД (ВЕРСИЯ ДЛЯ SHARED POLICY MAS) ===
         rewards = {agent: 0.0 for agent in self.agents}
 
-        # Константы для нормализации (чтобы reward был в диапазоне [-5, +5])
-        MAX_REWARD = 5.0
-        MIN_REWARD = -5.0
+        # Константы
+        MAX_REWARD = 15.0
+        MIN_REWARD = -15.0
 
-        # 1. BUDGET AGENT
-        budget_diff = abs(self.current_sum - self._budget)
+        # Предвычисляем общие переменные
+        cart_size = len(self.cart)
         budget_ratio = self.current_sum / self._budget if self._budget > 0 else 0
 
-        # Штраф за отклонение (нормализованный от -2 до 0)
-        normalized_budget_penalty = -(budget_diff / self._budget) * 2.0
-        rewards["budget_agent"] += normalized_budget_penalty
+        # ============== БОНУСЫ ==============
 
-        # Бонус за близость к бюджету (от 0 до +2)
-        if 0.85 <= budget_ratio <= 1.05:  # 85%-105% идеально
-            rewards["budget_agent"] += 2.0
-        elif 0.7 <= budget_ratio <= 1.2:  # 70%-120% приемлемо
-            rewards["budget_agent"] += 1.0
+        # 1. БОНУС ЗА НАЛИЧИЕ ТОВАРОВ
+        if cart_size > 0:
+            base_reward = cart_size * 2.0  # Увеличили до 2.0 (как в Single Agent)
+        else:
+            base_reward = 0.0
 
-        # Бонус за наличие товаров (от 0 до +1)
-        # Нормализуем: 0 товаров = 0, 10 товаров = +1
-        cart_bonus = min(len(self.cart) / 10.0, 1.0)
-        rewards["budget_agent"] += cart_bonus
+        # 2. BUDGET BONUS: За близость к бюджету
+        if 0.8 <= budget_ratio <= 1.2:
+            budget_bonus = 10.0
+        elif 0.6 <= budget_ratio <= 1.3:
+            budget_bonus = 5.0
+        elif budget_ratio > 0:
+            budget_bonus = 2.0
+        else:
+            budget_bonus = 0.0
 
-        # 2. COMPATIBILITY AGENT
-        if len(self.cart) > 0:
-            # Базовый бонус за наличие товаров (от 0 до +0.5)
-            rewards["compat_agent"] += min(len(self.cart) / 20.0, 0.5)
-            
-            if len(self.cart) > 1:
-                # Разнообразие категорий
-                categories = [self.products[idx]["product_category"] for idx in self.cart]
-                unique_categories = len(set(categories))
-                diversity_ratio = unique_categories / len(self.cart)
-                
-                # Бонус за разнообразие (от 0 до +2)
-                rewards["compat_agent"] += diversity_ratio * 2.0
-                
-                # Штраф за однообразие (если все товары из 1 категории)
-                if unique_categories == 1 and len(self.cart) >= 3:
-                    rewards["compat_agent"] -= 3.0
-                
-                # Штраф за дубликаты
-                from collections import Counter
-                product_counts = Counter(self.cart)
-                duplicate_penalty = 0
-                for product_idx, count in product_counts.items():
-                    if count > 2:
-                        duplicate_penalty += 0.5 * (count - 2)
-                rewards["compat_agent"] -= duplicate_penalty
-        # НОВОЕ: Штраф за повторяющиеся действия между агентами
-        # Если все 3 агента выбрали ОДИНАКОВОЕ действие → штраф
-        unique_actions = len(set(actions.values()))
-        if unique_actions == 1 and list(actions.values())[0] > 0:  # Все выбрали один товар (не skip)
-            for agent in self.agents:
-                rewards[agent] -= 3.0  # Штраф -1.0 за "стадное поведение"
-
-        # НОВОЕ: Штраф за повторение того же действия, что и на прошлом шаге
-        if len(self.last_actions) > 0:
-            for agent, action in actions.items():
-                if action in self.last_actions and action > 0:
-                    rewards[agent] -= 0.5  # -0.5 за повторение прошлого действия
-
-        # Сохраняем текущие действия для следующего шага
-        self.last_actions = list(actions.values())
-
-        # 3. PROFILE AGENT
-        # Базовый бонус за наличие товаров (от 0 до +0.5)
-        if len(self.cart) > 0:
-            rewards["profile_agent"] += min(len(self.cart) / 20.0, 0.5)
-
-        # Проверка тегов
-        violation_count = 0
-        match_count = 0
-
-        for idx in self.cart:
-            product = self.products[idx]
-            product_tags = set(product["tags"])
-            
-            # Штраф за нарушение exclude_tags
-            if product_tags & set(self.exclude_tags):
-                violation_count += 1
-            
-            # Бонус за соответствие include_tags
-            if self.include_tags and product_tags & set(self.include_tags):
-                match_count += 1
-
-        # Нормализованные штрафы/бонусы
-        rewards["profile_agent"] -= violation_count * 1.0  # -1 за каждое нарушение
-        rewards["profile_agent"] += match_count * 0.5      # +0.5 за каждое совпадение
-                        
-        # Обновляем накопленные награды
-        for agent, r in rewards.items():
-            self._cumulative_rewards[agent] += r
-        
-        # === НОВЫЕ НАБЛЮДЕНИЯ ===
-        obs = {}
-        for agent in self.agents:
-            obs[agent] = self._get_observation(agent)
-        
-        # === ПРОВЕРКА ЗАВЕРШЕНИЯ ===
-        done = self.steps >= self._max_steps
-
-        # НОВОЕ: Финальный штраф за недостаток разнообразия
-        if done and len(self.cart) >= 3:
+        # 3. DIVERSITY BONUS: За разнообразие категорий
+        diversity_bonus = 0.0
+        if cart_size > 1:
             categories = [self.products[idx]["product_category"] for idx in self.cart]
             unique_categories = len(set(categories))
             
-            if unique_categories < 3:
-                for agent in self.agents:
-                    rewards[agent] -= 2.0
+            if unique_categories >= 5:
+                diversity_bonus = 8.0
+            elif unique_categories >= 3:
+                diversity_bonus = 5.0
+            elif unique_categories >= 2:
+                diversity_bonus = 2.0
+            else:
+                diversity_bonus = -2.0
 
-        # КЛИППИНГ В КОНЦЕ (после всех штрафов и бонусов)
+        # Применяем общие бонусы ко всем агентам
+        for agent in self.agents:
+            rewards[agent] += base_reward + budget_bonus + diversity_bonus
+
+        # ============== ШТРАФЫ ==============
+
+        # УБРАЛИ: Штраф за одинаковые действия (противоречит shared policy)
+
+        # 1. ШТРАФ: За skip всех агентов
+        skip_count = sum(1 for action in actions.values() if action == 0)
+        if skip_count == 3:
+            skip_penalty = -5.0  # Увеличили с -3.0
+            for agent in self.agents:
+                rewards[agent] += skip_penalty
+
+        # Сохраняем для совместимости
+        self.last_actions = list(actions.values())
+
+        # 2. ШТРАФ: За дубликаты товаров (если один товар >2 раз)
+        if cart_size > 2:
+            from collections import Counter
+            product_counts = Counter(self.cart)
+            duplicate_penalty = 0.0
+            for product_idx, count in product_counts.items():
+                if count > 2:
+                    duplicate_penalty += -1.0 * (count - 2)
+            
+            if duplicate_penalty < 0:
+                for agent in self.agents:
+                    rewards[agent] += duplicate_penalty
+
+        # 3. ШТРАФ: За нарушение exclude_tags
+        if cart_size > 0 and self.exclude_tags:
+            violation_count = 0
+            for idx in self.cart:
+                product = self.products[idx]
+                product_tags = set(product["tags"])
+                if product_tags & set(self.exclude_tags):
+                    violation_count += 1
+            
+            if violation_count > 0:
+                violation_penalty = -2.0 * violation_count
+                rewards["profile_agent"] += violation_penalty
+
+        # ============== ФИНАЛЬНЫЙ БОНУС/ШТРАФ ==============
+
+        done = self.steps >= self._max_steps
+
+        if done:
+            if cart_size >= 5 and 0.7 <= budget_ratio <= 1.2:
+                categories = [self.products[idx]["product_category"] for idx in self.cart]
+                unique_categories = len(set(categories))
+                
+                if unique_categories >= 3:
+                    final_bonus = 30.0
+                    for agent in self.agents:
+                        rewards[agent] += final_bonus
+                else:
+                    final_bonus = 10.0
+                    for agent in self.agents:
+                        rewards[agent] += final_bonus
+            
+            elif cart_size == 0:
+                empty_penalty = -30.0
+                for agent in self.agents:
+                    rewards[agent] += empty_penalty
+            
+            elif cart_size < 5:
+                small_cart_penalty = -10.0  # Увеличили с -5.0
+                for agent in self.agents:
+                    rewards[agent] += small_cart_penalty
+
+        # ============== КЛИППИНГ ==============
         for agent in rewards:
             rewards[agent] = max(MIN_REWARD, min(MAX_REWARD, rewards[agent]))
+
+        # ============== OBSERVATION ==============
+        obs = {}
+        for agent in self.agents:
+            obs[agent] = self._get_observation(agent)
 
         # Обновляем накопленные награды
         for agent, r in rewards.items():
@@ -261,21 +265,21 @@ class BasketEnv(ParallelEnv):
         terms = {agent: done for agent in self.agents}
         truncs = {agent: False for agent in self.agents}
 
-        
         infos = {
             agent: {
                 "cart_sum": self.current_sum, 
-                "cart_size": len(self.cart),
-                "cumulative_reward": self._cumulative_rewards[agent]
+                "cart_size": cart_size,
+                "cumulative_reward": self._cumulative_rewards[agent],
+                "budget_ratio": budget_ratio
             } 
             for agent in self.agents
         }
-        
-        # Если эпизод завершён, убираем агентов
+
         if done:
             self.agents = []
-        
+
         return obs, rewards, terms, truncs, infos
+
     
     def render(self):
         if self.render_mode in (None, "human"):

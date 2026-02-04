@@ -8,13 +8,17 @@ import math
 import json
 
 
-JSON_PATH = Path("data/tag_rules.json") 
+JSON_PATH = Path("data/tag_rules_extended.json") 
+MEAL_PATH = Path("data/meal_components_extended.json") 
 INPUT_FILE = Path("data/raw/russian_supermarket_prices.csv")      
 DB_PATH = Path("data/processed/products.db")      
 
 
 with open(JSON_PATH, "r", encoding="utf-8") as f:
     TAG_RULES = json.load(f)
+
+with open(MEAL_PATH, "r", encoding="utf-8") as f:
+    MEAL_DATA = json.load(f)
 
 
 USECOLS = ['product_name', 'product_category', 'brand',
@@ -28,7 +32,8 @@ DB_SCHEMA = {
     "package_size": "REAL",
     "unit": "TEXT",
     "price_per_unit": "REAL",
-    "tags": "TEXT"
+    "tags": "TEXT",
+    "meal_components": "TEXT"
 }
 
 
@@ -45,11 +50,66 @@ EXCLUDED_CATEGORIES = [
     'салфетки', 'подгузники', 'прокладки'
 ]
 
-# Максимальная разумная цена за единицу (₽/кг, ₽/л, ₽/шт)
-MAX_REASONABLE_PRICE = 3000  # 3000₽/кг — даже для деликатесов это много
+MAX_REASONABLE_PRICE = 3000  
 
 
-# ======================================================================
+def assign_meal_components(product_name, product_category):
+    """
+    ✅ ИСПРАВЛЕНО: Ограничиваем максимум 2 компонента на товар
+    
+    Автоматическое присвоение meal_components на основе названия и категории.
+    
+    Returns:
+        List[str]: список компонентов (максимум 2, например, ['main_course', 'side_dish'])
+    """
+    name = str(product_name).lower()
+    category = str(product_category).lower()
+    text = f"{name} {category}"
+    
+    components = set()
+    matched_categories = []  # Список совпавших категорий для приоритизации
+    
+    # Проходим по всем категориям продуктов
+    product_categories = MEAL_DATA.get('product_categories', {})
+    
+    for category_name, category_data in product_categories.items():
+        keywords = category_data.get('name', [])
+        
+        for keyword in keywords:
+            if keyword.lower() in text:
+                meal_comps = category_data.get('attributes', {}).get('meal_components', [])
+                matched_categories.append((category_name, meal_comps))
+                components.update(meal_comps)
+                break
+    
+    # Преобразуем set в список
+    result = list(components)
+    
+    if len(result) > 2:
+        # Приоритизация компонентов (основные блюда важнее снеков)
+        priority_order = [
+            'main_course',
+            'side_dish',
+            'beverage',
+            'salad',
+            'bakery',
+            'sauce',
+            'dessert',
+            'snack'
+        ]
+        
+        # Сортируем по приоритету
+        result_sorted = []
+        for comp in priority_order:
+            if comp in result:
+                result_sorted.append(comp)
+        
+        # Берём первые 2
+        result = result_sorted[:2]
+    
+    # Если ничего не нашли, возвращаем 'other'
+    return result if result else ['other']
+
 
 
 def to_float(x):
@@ -96,12 +156,12 @@ def normalize_price(price, size, unit):
     # 1. Граммы → нормализуем к килограммам
     if unit == 'г':
         price_per_kg = round(price / size * 1000, 2)
-        return price_per_kg, 'кг'  # ← ИСПРАВЛЕНО: возвращаем 'кг', не 'г'
+        return price_per_kg, 'кг'
     
     # 2. Миллилитры → нормализуем к литрам
     if unit == 'мл':
         price_per_liter = round(price / size * 1000, 2)
-        return price_per_liter, 'л'  # ← ИСПРАВЛЕНО: возвращаем 'л', не 'мл'
+        return price_per_liter, 'л'
     
     # 3. Килограммы (уже нормализованы)
     if unit == 'кг':
@@ -137,11 +197,20 @@ def extract_tags(product_name, product_category):
     tags = set()
     
     for tag, rules in TAG_RULES.items():
+        # Пропускаем вложенные структуры (allergen_markers, quality_markers, certification)
+        if not isinstance(rules, dict):
+            continue
+        
         for field, keywords in rules.items():
+            # Пропускаем поля, которые не являются списками
+            if not isinstance(keywords, list):
+                continue
+            
             text = name if field == "name" else category
             
             if any(word in text for word in keywords):
                 tags.add(tag)
+                break  # Нашли совпадение для этого тега
     
     return sorted(tags)
 
@@ -204,14 +273,21 @@ def normalize_row(row):
         product_category=row['product_category']
     )
     
+    # Извлекаем meal_components (ИСПРАВЛЕНО!)
+    meal_components = assign_meal_components(
+        product_name=name,
+        product_category=row['product_category']
+    )
+    
     return {
         "product_name": name,
         "product_category": row['product_category'],
         "brand": row['brand'],
         "package_size": size,
-        "unit": normalized_unit,  # ← ИСПРАВЛЕНО: сохраняем нормализованный unit
+        "unit": normalized_unit,
         "price_per_unit": price_per_unit,
-        "tags": "|".join(tags)
+        "tags": "|".join(tags),
+        "meal_components": "|".join(meal_components)
     }
 
 
