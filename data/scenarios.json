@@ -1,0 +1,935 @@
+{
+  "version": "1.0",
+  "description": "Сценарии блюд для агента Compatibility. Каждый сценарий содержит набор ингредиентов с указанием количества на человека.",
+  "scenarios": [
+    {
+      "id": "breakfast_omelette",
+      "name": "Омлет с сыром и хлебом",
+      "meal_type": "breakfast",
+      "description": "Классический завтрак: омлет, хлеб, масло, сыр",
+      "serves_base": 1,
+      "estimated_time_min": 15,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "яйца",
+          "search_query": "яйца куриные",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "bakery",
+          "ingredient": "хлеб",
+          "search_query": "хлеб белый батон",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["багет", "булка"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "сыр",
+          "search_query": "сыр твердый российский",
+          "quantity_per_person": 30,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["моцарелла", "гауда"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло сливочное",
+          "quantity_per_person": 10,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["маргарин"]
+        },
+        {
+          "meal_component": "beverage",
+          "ingredient": "чай",
+          "search_query": "чай черный",
+          "quantity_per_person": 2,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["кофе", "сок"]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_oatmeal",
+      "name": "Овсяная каша с молоком и фруктами",
+      "meal_type": "breakfast",
+      "description": "Здоровый завтрак: овсянка, молоко, банан",
+      "serves_base": 1,
+      "estimated_time_min": 10,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "овсянка",
+          "search_query": "овсянка геркулес хлопья",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["овсяные хлопья"]
+        },
+        {
+          "meal_component": "beverage",
+          "ingredient": "молоко",
+          "search_query": "молоко 3.2%",
+          "quantity_per_person": 200,
+          "unit": "мл",
+          "required": true,
+          "alternatives": ["растительное молоко"]
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "банан",
+          "search_query": "банан",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["яблоко", "ягоды"]
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "сахар",
+          "search_query": "сахар песок",
+          "quantity_per_person": 10,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["мёд"]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_cottage_cheese",
+      "name": "Творог со сметаной",
+      "meal_type": "breakfast",
+      "description": "Легкий завтрак: творог, сметана, сахар",
+      "serves_base": 1,
+      "estimated_time_min": 5,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "творог",
+          "search_query": "творог 9%",
+          "quantity_per_person": 150,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "сметана",
+          "search_query": "сметана 20%",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["йогурт"]
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "сахар",
+          "search_query": "сахар",
+          "quantity_per_person": 15,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["мёд", "варенье"]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_sandwich",
+      "name": "Бутерброд с колбасой и сыром",
+      "meal_type": "breakfast",
+      "description": "Быстрый завтрак: хлеб, колбаса, сыр, масло",
+      "serves_base": 1,
+      "estimated_time_min": 5,
+      "components": [
+        {
+          "meal_component": "bakery",
+          "ingredient": "хлеб",
+          "search_query": "хлеб батон нарезной",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "main_course",
+          "ingredient": "колбаса",
+          "search_query": "колбаса вареная докторская",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["ветчина"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "сыр",
+          "search_query": "сыр российский",
+          "quantity_per_person": 40,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло сливочное",
+          "quantity_per_person": 15,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["маргарин"]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_pancakes",
+      "name": "Блины со сметаной",
+      "meal_type": "breakfast",
+      "description": "Традиционный завтрак: блины, сметана, варенье",
+      "serves_base": 2,
+      "estimated_time_min": 30,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "блины",
+          "search_query": "блины замороженные",
+          "quantity_per_person": 150,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "сметана",
+          "search_query": "сметана 20%",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "варенье",
+          "search_query": "варенье клубничное",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["джем", "мёд"]
+        }
+      ]
+    },
+    {
+      "id": "lunch_chicken_rice",
+      "name": "Курица с рисом",
+      "meal_type": "lunch",
+      "description": "Сытный обед: курица, рис, овощи",
+      "serves_base": 2,
+      "estimated_time_min": 40,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "курица",
+          "search_query": "курица филе грудка",
+          "quantity_per_person": 250,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["индейка"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "рис",
+          "search_query": "рис круглозерный",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["гречка"]
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "морковь",
+          "search_query": "морковь свежая",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло растительное подсолнечное",
+          "quantity_per_person": 20,
+          "unit": "мл",
+          "required": true,
+          "alternatives": ["масло оливковое"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "специи",
+          "search_query": "соль перец специи",
+          "quantity_per_person": 5,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "lunch_pasta_bolognese",
+      "name": "Паста Болоньезе",
+      "meal_type": "lunch",
+      "description": "Итальянский обед: паста, фарш, томатный соус",
+      "serves_base": 2,
+      "estimated_time_min": 30,
+      "components": [
+        {
+          "meal_component": "side_dish",
+          "ingredient": "паста",
+          "search_query": "макароны спагетти пенне",
+          "quantity_per_person": 120,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "main_course",
+          "ingredient": "фарш",
+          "search_query": "фарш говяжий свиной",
+          "quantity_per_person": 150,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["фарш куриный"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "томатный соус",
+          "search_query": "соус томатный паста",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["кетчуп"]
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "лук",
+          "search_query": "лук репчатый",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "сыр",
+          "search_query": "сыр пармезан твердый",
+          "quantity_per_person": 30,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "lunch_fish_potatoes",
+      "name": "Рыба с картофелем",
+      "meal_type": "lunch",
+      "description": "Легкий обед: рыба, картофель, овощи",
+      "serves_base": 2,
+      "estimated_time_min": 35,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "рыба",
+          "search_query": "рыба филе минтай треска",
+          "quantity_per_person": 200,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["лосось", "горбуша"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "картофель",
+          "search_query": "картофель свежий",
+          "quantity_per_person": 300,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "овощи",
+          "search_query": "овощи замороженные смесь",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло растительное",
+          "quantity_per_person": 20,
+          "unit": "мл",
+          "required": true,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "lunch_soup_bread",
+      "name": "Суп с хлебом",
+      "meal_type": "lunch",
+      "description": "Домашний обед: суп, хлеб, сметана",
+      "serves_base": 3,
+      "estimated_time_min": 50,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "мясо для супа",
+          "search_query": "говядина на кости суповой набор",
+          "quantity_per_person": 150,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["курица"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "картофель",
+          "search_query": "картофель",
+          "quantity_per_person": 200,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "морковь",
+          "search_query": "морковь",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "лук",
+          "search_query": "лук репчатый",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "bakery",
+          "ingredient": "хлеб",
+          "search_query": "хлеб черный ржаной",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "сметана",
+          "search_query": "сметана 20%",
+          "quantity_per_person": 30,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "lunch_buckwheat_cutlet",
+      "name": "Гречка с котлетой",
+      "meal_type": "lunch",
+      "description": "Классический обед: котлета, гречка, овощи",
+      "serves_base": 2,
+      "estimated_time_min": 30,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "котлеты",
+          "search_query": "котлеты мясные замороженные",
+          "quantity_per_person": 150,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["фарш"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "гречка",
+          "search_query": "гречка ядрица",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["рис"]
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "огурец",
+          "search_query": "огурец свежий",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["помидор"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло сливочное",
+          "quantity_per_person": 15,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "dinner_chicken_vegetables",
+      "name": "Запеченная курица с овощами",
+      "meal_type": "dinner",
+      "description": "Здоровый ужин: курица, картофель, морковь",
+      "serves_base": 2,
+      "estimated_time_min": 45,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "курица",
+          "search_query": "курица бедро голень",
+          "quantity_per_person": 250,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["индейка"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "картофель",
+          "search_query": "картофель",
+          "quantity_per_person": 250,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "морковь",
+          "search_query": "морковь",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["свекла"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло растительное",
+          "quantity_per_person": 20,
+          "unit": "мл",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "специи",
+          "search_query": "специи для курицы",
+          "quantity_per_person": 5,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["соль перец"]
+        }
+      ]
+    },
+    {
+      "id": "dinner_fish_salad",
+      "name": "Рыба с салатом",
+      "meal_type": "dinner",
+      "description": "Легкий ужин: рыба, овощной салат",
+      "serves_base": 2,
+      "estimated_time_min": 25,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "рыба",
+          "search_query": "рыба филе семга лосось",
+          "quantity_per_person": 200,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["форель", "дорадо"]
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "салат",
+          "search_query": "салат листовой айсберг",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "помидор",
+          "search_query": "помидор томат",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["черри"]
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "огурец",
+          "search_query": "огурец свежий",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло оливковое",
+          "quantity_per_person": 15,
+          "unit": "мл",
+          "required": true,
+          "alternatives": ["масло растительное"]
+        }
+      ]
+    },
+    {
+      "id": "dinner_pasta_cream",
+      "name": "Паста в сливочном соусе",
+      "meal_type": "dinner",
+      "description": "Вечерняя паста: макароны, сливки, сыр",
+      "serves_base": 2,
+      "estimated_time_min": 20,
+      "components": [
+        {
+          "meal_component": "side_dish",
+          "ingredient": "паста",
+          "search_query": "паста спагетти феттучини",
+          "quantity_per_person": 120,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "сливки",
+          "search_query": "сливки 20%",
+          "quantity_per_person": 100,
+          "unit": "мл",
+          "required": true,
+          "alternatives": ["молоко сметана"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "сыр",
+          "search_query": "сыр пармезан твердый",
+          "quantity_per_person": 40,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "чеснок",
+          "search_query": "чеснок свежий",
+          "quantity_per_person": 10,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло сливочное",
+          "quantity_per_person": 20,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "dinner_omelette_light",
+      "name": "Легкий омлет с овощами",
+      "meal_type": "dinner",
+      "description": "Диетический ужин: омлет, овощи, хлеб",
+      "serves_base": 1,
+      "estimated_time_min": 15,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "яйца",
+          "search_query": "яйца куриные",
+          "quantity_per_person": 2,
+          "unit": "шт",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "помидор",
+          "search_query": "помидор",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "перец",
+          "search_query": "перец болгарский",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "bakery",
+          "ingredient": "хлеб",
+          "search_query": "хлеб цельнозерновой",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло растительное",
+          "quantity_per_person": 10,
+          "unit": "мл",
+          "required": true,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "dinner_pelmeni",
+      "name": "Пельмени со сметаной",
+      "meal_type": "dinner",
+      "description": "Быстрый ужин: пельмени, сметана",
+      "serves_base": 2,
+      "estimated_time_min": 15,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "пельмени",
+          "search_query": "пельмени замороженные",
+          "quantity_per_person": 300,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["вареники"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "сметана",
+          "search_query": "сметана 20%",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["майонез"]
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "масло",
+          "search_query": "масло сливочное",
+          "quantity_per_person": 15,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        }
+      ]
+    },
+    {
+      "id": "dinner_cottage_cheese_light",
+      "name": "Творог с йогуртом",
+      "meal_type": "dinner",
+      "description": "Легкий белковый ужин: творог, йогурт, фрукты",
+      "serves_base": 1,
+      "estimated_time_min": 5,
+      "components": [
+        {
+          "meal_component": "main_course",
+          "ingredient": "творог",
+          "search_query": "творог обезжиренный 5%",
+          "quantity_per_person": 200,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "йогурт",
+          "search_query": "йогурт натуральный",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["кефир"]
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "банан",
+          "search_query": "банан",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["яблоко", "ягоды"]
+        }
+      ]
+    },
+    {
+      "id": "dinner_sandwich_hot",
+      "name": "Горячий бутерброд",
+      "meal_type": "dinner",
+      "description": "Быстрый ужин: бутерброд с колбасой и сыром",
+      "serves_base": 1,
+      "estimated_time_min": 10,
+      "components": [
+        {
+          "meal_component": "bakery",
+          "ingredient": "хлеб",
+          "search_query": "хлеб белый батон",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "main_course",
+          "ingredient": "колбаса",
+          "search_query": "колбаса вареная",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["ветчина", "бекон"]
+        },
+        {
+          "meal_component": "side_dish",
+          "ingredient": "сыр",
+          "search_query": "сыр российский",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "salad",
+          "ingredient": "помидор",
+          "search_query": "помидор",
+          "quantity_per_person": 80,
+          "unit": "г",
+          "required": false,
+          "alternatives": []
+        },
+        {
+          "meal_component": "sauce",
+          "ingredient": "майонез",
+          "search_query": "майонез",
+          "quantity_per_person": 20,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["кетчуп"]
+        }
+      ]
+    },
+    {
+      "id": "snack_fruit_yogurt",
+      "name": "Йогурт с фруктами",
+      "meal_type": "snack",
+      "description": "Легкий перекус: йогурт, банан, печенье",
+      "serves_base": 1,
+      "estimated_time_min": 3,
+      "components": [
+        {
+          "meal_component": "dessert",
+          "ingredient": "йогурт",
+          "search_query": "йогурт питьевой фруктовый",
+          "quantity_per_person": 200,
+          "unit": "мл",
+          "required": true,
+          "alternatives": ["кефир"]
+        },
+        {
+          "meal_component": "dessert",
+          "ingredient": "банан",
+          "search_query": "банан",
+          "quantity_per_person": 100,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["яблоко"]
+        },
+        {
+          "meal_component": "snack",
+          "ingredient": "печенье",
+          "search_query": "печенье овсяное",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": false,
+          "alternatives": ["крекер"]
+        }
+      ]
+    },
+    {
+      "id": "snack_cheese_crackers",
+      "name": "Сыр с крекерами",
+      "meal_type": "snack",
+      "description": "Быстрый перекус: сыр, крекеры",
+      "serves_base": 1,
+      "estimated_time_min": 2,
+      "components": [
+        {
+          "meal_component": "snack",
+          "ingredient": "сыр",
+          "search_query": "сыр твердый",
+          "quantity_per_person": 50,
+          "unit": "г",
+          "required": true,
+          "alternatives": []
+        },
+        {
+          "meal_component": "snack",
+          "ingredient": "крекеры",
+          "search_query": "крекеры соленые",
+          "quantity_per_person": 40,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["хлебцы"]
+        }
+      ]
+    },
+    {
+      "id": "snack_nuts_dried_fruits",
+      "name": "Орехи и сухофрукты",
+      "meal_type": "snack",
+      "description": "Энергетический перекус: орехи, сухофрукты",
+      "serves_base": 1,
+      "estimated_time_min": 1,
+      "components": [
+        {
+          "meal_component": "snack",
+          "ingredient": "орехи",
+          "search_query": "орехи миндаль кешью",
+          "quantity_per_person": 30,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["арахис"]
+        },
+        {
+          "meal_component": "snack",
+          "ingredient": "сухофрукты",
+          "search_query": "сухофрукты курага изюм",
+          "quantity_per_person": 40,
+          "unit": "г",
+          "required": true,
+          "alternatives": ["финики"]
+        }
+      ]
+    }
+  ]
+}

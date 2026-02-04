@@ -7,10 +7,10 @@
 
     <div class="container">
       
+      <!-- ========== ЛЕВАЯ ПАНЕЛЬ (БЕЗ ИЗМЕНЕНИЙ) ========== -->
       <aside class="sidebar">
         <h2>Ваш запрос</h2>
 
-        <!-- Поле для ввода запроса на естественном языке -->
         <div class="form-group">
           <label>Что вам нужно?</label>
           <input 
@@ -31,7 +31,6 @@
 
         <hr class="divider">
 
-        <!-- Дополнительные параметры (пока не используются LLM, но можно оставить для будущего) -->
         <h3>Параметры</h3>
 
         <div class="form-group">
@@ -54,59 +53,54 @@
         </div>
       </aside>
 
-      <!-- ========== ПРАВАЯ ПАНЕЛЬ (РЕЗУЛЬТАТЫ) ========== -->
+      <!-- ========== ПРАВАЯ ПАНЕЛЬ ========== -->
       <main class="content">
         
-        <!-- ========== СОСТОЯНИЕ 1: ЗАГРУЗКА ========== -->
+        <!-- СОСТОЯНИЕ 1: ЗАГРУЗКА -->
         <div v-if="loading" class="state-loading">
           <div class="spinner"></div>
-          <p class="loading-text">🤖 Три агента обсуждают вашу корзину...</p>
+          <p class="loading-text">🤖 Агенты работают...</p>
           <p class="loading-desc">
             🧠 LLM парсит ваш запрос<br>
-            💰 Budget Agent ищет дешевле<br>
-            🔗 Compatibility Agent проверяет совместимость<br>
-            👤 Profile Agent учитывает ваши предпочтения
+            🔗 Compatibility Agent подбирает товары<br>
+            💰 Budget Agent оптимизирует цену<br>
+            👤 Profile Agent учитывает предпочтения
           </p>
         </div>
 
-        <!-- ========== СОСТОЯНИЕ 2: ОШИБКА ========== -->
+        <!-- СОСТОЯНИЕ 2: ОШИБКА -->
         <div v-else-if="error" class="state-error">
           <p class="error-text">{{ error }}</p>
         </div>
 
-        <!-- ========== СОСТОЯНИЕ 3: УСПЕХ (РЕЗУЛЬТАТ) ========== -->
+        <!-- СОСТОЯНИЕ 3: УСПЕХ -->
         <div v-else-if="basket.length > 0" class="state-success">
           
-          <!-- ========== БЛОК "ЧТО ПОНЯЛ LLM" ========== -->
+          <!-- БЛОК "ЧТО ПОНЯЛ LLM" -->
           <div v-if="parsedConstraints" class="parsed-info">
             <h3>🧠 Что я понял:</h3>
             <div class="parsed-grid">
               
-              <!-- Бюджет -->
               <div v-if="parsedConstraints.budget_rub" class="parsed-item">
                 <span class="parsed-label">Бюджет:</span>
                 <strong>{{ formatPrice(parsedConstraints.budget_rub) }} ₽</strong>
               </div>
               
-              <!-- Количество людей -->
               <div v-if="parsedConstraints.people" class="parsed-item">
                 <span class="parsed-label">Людей:</span>
                 <strong>{{ parsedConstraints.people }}</strong>
               </div>
               
-              <!-- Тип приёма пищи -->
               <div v-if="parsedConstraints.meal_type.length > 0" class="parsed-item">
                 <span class="parsed-label">Приём пищи:</span>
                 <strong>{{ parsedConstraints.meal_type.join(', ') }}</strong>
               </div>
               
-              <!-- Запрещённые теги -->
               <div v-if="parsedConstraints.exclude_tags.length > 0" class="parsed-item">
                 <span class="parsed-label">Исключить:</span>
                 <strong class="exclude">{{ parsedConstraints.exclude_tags.join(', ') }}</strong>
               </div>
               
-              <!-- Обязательные теги -->
               <div v-if="parsedConstraints.include_tags.length > 0" class="parsed-item">
                 <span class="parsed-label">Обязательно:</span>
                 <strong class="include">{{ parsedConstraints.include_tags.join(', ') }}</strong>
@@ -115,17 +109,16 @@
             </div>
           </div>
 
-          <!-- ========== ЗАГОЛОВОК КОРЗИНЫ ========== -->
+          <!-- ЗАГОЛОВОК КОРЗИНЫ -->
           <h2>✅ Оптимальная корзина</h2>
 
-          <!-- ========== СПИСОК ТОВАРОВ ========== -->
+          <!-- СПИСОК ТОВАРОВ -->
           <div class="products">
             <div 
               v-for="item in basket"
               :key="item.id"
               class="product-card"
             >
-              <!-- Верх карточки: название + бейдж агента -->
               <div class="product-top">
                 <h3>{{ item.name }}</h3>
                 <span class="badge" :class="'badge-' + item.agent">
@@ -133,10 +126,8 @@
                 </span>
               </div>
               
-              <!-- Причина выбора товара -->
               <p class="product-reason">{{ item.reason }}</p>
               
-              <!-- Низ карточки: цена + рейтинг -->
               <div class="product-bottom">
                 <span class="price">{{ formatPrice(item.price) }} ₽</span>
                 <span class="rating">⭐ {{ item.rating || 4.5 }}</span>
@@ -144,7 +135,7 @@
             </div>
           </div>
 
-          <!-- ========== ИТОГОВАЯ СВОДКА ========== -->
+          <!-- ИТОГОВАЯ СВОДКА -->
           <div class="summary">
             <div class="summary-row">
               <span>Товаров:</span>
@@ -160,13 +151,41 @@
             </div>
           </div>
 
-          <!-- ========== КНОПКА "ДОБАВИТЬ В КОРЗИНУ" ========== -->
+          <!-- КНОПКА "ДОБАВИТЬ В КОРЗИНУ" -->
           <button @click="addToCart" class="btn-secondary">
             🛍️ Добавить в корзину
           </button>
+          
+          <!-- ========== НОВОЕ: ИСТОРИЯ АГЕНТОВ ========== -->
+          <div v-if="stages.length > 0" class="stages-history">
+            <h3>📊 История обработки</h3>
+            <div class="stages-list">
+              <div 
+                v-for="stage in stages" 
+                :key="stage.agent"
+                class="stage-item"
+              >
+                <div class="stage-header">
+                  <span class="stage-name">{{ stage.name }}</span>
+                  <span class="stage-duration">{{ stage.duration }}с</span>
+                </div>
+                <div class="stage-details">
+                  <span v-if="stage.result.scenario">
+                    Сценарий: {{ stage.result.scenario.name }}
+                  </span>
+                  <span v-if="stage.result.compatibility_score">
+                    Score: {{ stage.result.compatibility_score.total_score.toFixed(2) }}
+                  </span>
+                  <span v-if="stage.result.message">
+                    {{ stage.result.message }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- ========== СОСТОЯНИЕ 4: ПУСТО (НАЧАЛЬНОЕ) ========== -->
+        <!-- СОСТОЯНИЕ 4: ПУСТО -->
         <div v-else class="state-empty">
           <p class="empty-text">📋 Введите запрос и нажмите кнопку</p>
         </div>
@@ -180,20 +199,20 @@
 import { useBasket } from './composables/useBasket'
 import './App.css'
 
-// Импортируем всё из composable (reactive state + методы)
 const {
-  userQuery,          // ref: текст запроса пользователя
-  basket,             // ref: массив товаров в корзине
-  loading,            // ref: флаг загрузки
-  error,              // ref: текст ошибки
-  diet,               // ref: выбранная диета
-  allergies,          // ref: аллергии
-  originalPrice,      // ref: исходная цена (до скидки)
-  totalPrice,         // computed: сумма всех товаров
-  agentLabel,         // object: маппинг agent -> название
-  parsedConstraints,  // ref: результат LLM-парсинга
-  optimizeBasket,     // function: запуск оптимизации
-  formatPrice,        // function: форматирование цены
-  addToCart           // function: добавление в корзину
+  userQuery,
+  basket,
+  loading,
+  error,
+  diet,
+  allergies,
+  originalPrice,
+  totalPrice,
+  agentLabel,
+  parsedConstraints,
+  stages,  // НОВОЕ
+  optimizeBasket,
+  formatPrice,
+  addToCart
 } = useBasket()
 </script>
