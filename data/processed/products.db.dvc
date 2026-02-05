@@ -1,0 +1,5 @@
+outs:
+- md5: 6f2de5646f57f849a5b0ed891f11d363
+  size: 119267328
+  hash: md5
+  path: products.db
