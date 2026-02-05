@@ -1,8 +1,5 @@
 [core]
     remote = yandex
-['remote "gdrive"']
-    url = gdrive://1qD_221zo6MEvvO_SKstoa2DWvziilkzo
-    gdrive_acknowledge_abuse = true
 ['remote "yandex"']
     url = s3://basket-debate-storage/dvc-data
     endpointurl = https://storage.yandexcloud.net

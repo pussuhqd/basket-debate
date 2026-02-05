@@ -1,0 +1,1302 @@
+[
+  {
+    "id": 900101,
+    "name": "Овсянка Геркулес",
+    "category": "Крупы",
+    "brand": "Myllyn Paras",
+    "price": 89.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "cereals",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900102,
+    "name": "Рис круглозерный",
+    "category": "Крупы",
+    "brand": "Мистраль",
+    "price": 79.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "cereals",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900103,
+    "name": "Гречка ядрица",
+    "category": "Крупы",
+    "brand": "Makfa",
+    "price": 99.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "cereals",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900104,
+    "name": "Рис длиннозерный",
+    "category": "Крупы",
+    "brand": "Мистраль",
+    "price": 109.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "cereals",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900105,
+    "name": "Перловка",
+    "category": "Крупы",
+    "brand": "Увелка",
+    "price": 59.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "cereals",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900106,
+    "name": "Пшено",
+    "category": "Крупы",
+    "brand": "Мистраль",
+    "price": 69.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "cereals",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900107,
+    "name": "Макароны спагетти",
+    "category": "Макароны",
+    "brand": "Barilla",
+    "price": 119.9,
+    "unit": "г",
+    "size": 500,
+    "tags": "pasta",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900108,
+    "name": "Макароны пенне",
+    "category": "Макароны",
+    "brand": "Barilla",
+    "price": 129.9,
+    "unit": "г",
+    "size": 500,
+    "tags": "pasta",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900109,
+    "name": "Макароны фузилли",
+    "category": "Макароны",
+    "brand": "Makfa",
+    "price": 89.9,
+    "unit": "г",
+    "size": 450,
+    "tags": "pasta",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900110,
+    "name": "Лапша яичная",
+    "category": "Макароны",
+    "brand": "Роллтон",
+    "price": 79.9,
+    "unit": "г",
+    "size": 400,
+    "tags": "pasta",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900201,
+    "name": "Помидоры свежие",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 149.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900202,
+    "name": "Огурцы свежие",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 129.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900203,
+    "name": "Картофель",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 49.9,
+    "unit": "кг",
+    "size": 2.5,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900204,
+    "name": "Морковь",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 39.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900205,
+    "name": "Лук репчатый",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 29.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900206,
+    "name": "Капуста белокочанная",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 39.9,
+    "unit": "кг",
+    "size": 1.5,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900207,
+    "name": "Перец болгарский",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 199.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900208,
+    "name": "Баклажаны",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 129.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "vegetables",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900209,
+    "name": "Кабачки",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 89.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900210,
+    "name": "Свекла",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 35.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900211,
+    "name": "Чеснок",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 249.9,
+    "unit": "кг",
+    "size": 0.2,
+    "tags": "vegetables",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900212,
+    "name": "Брокколи",
+    "category": "Овощи",
+    "brand": "4 сезона",
+    "price": 159.9,
+    "unit": "кг",
+    "size": 0.4,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900213,
+    "name": "Цветная капуста",
+    "category": "Овощи",
+    "brand": "4 сезона",
+    "price": 149.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "vegetables",
+    "components": [
+      "side_dish"
+    ]
+  },
+  {
+    "id": 900214,
+    "name": "Салат айсберг",
+    "category": "Овощи",
+    "brand": "Бондюэль",
+    "price": 119.9,
+    "unit": "шт",
+    "size": 1,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900215,
+    "name": "Зелень укроп",
+    "category": "Овощи",
+    "brand": "Местные",
+    "price": 49.9,
+    "unit": "г",
+    "size": 50,
+    "tags": "vegetables",
+    "components": [
+      "salad"
+    ]
+  },
+  {
+    "id": 900301,
+    "name": "Бананы",
+    "category": "Фрукты",
+    "brand": "Эквадор",
+    "price": 89.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900302,
+    "name": "Яблоки Голден",
+    "category": "Фрукты",
+    "brand": "Россия",
+    "price": 119.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900303,
+    "name": "Яблоки Гренни Смит",
+    "category": "Фрукты",
+    "brand": "Россия",
+    "price": 139.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900304,
+    "name": "Апельсины",
+    "category": "Фрукты",
+    "brand": "Турция",
+    "price": 129.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900305,
+    "name": "Мандарины",
+    "category": "Фрукты",
+    "brand": "Марокко",
+    "price": 159.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900306,
+    "name": "Груши",
+    "category": "Фрукты",
+    "brand": "Аргентина",
+    "price": 149.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900307,
+    "name": "Киви",
+    "category": "Фрукты",
+    "brand": "Новая Зеландия",
+    "price": 199.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900308,
+    "name": "Ананас",
+    "category": "Фрукты",
+    "brand": "Коста-Рика",
+    "price": 179.9,
+    "unit": "шт",
+    "size": 1,
+    "tags": "fruits",
+    "components": [
+      "dessert"
+    ]
+  },
+  {
+    "id": 900309,
+    "name": "Виноград кишмиш",
+    "category": "Фрукты",
+    "brand": "Узбекистан",
+    "price": 249.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "fruits",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900310,
+    "name": "Лимоны",
+    "category": "Фрукты",
+    "brand": "Турция",
+    "price": 129.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "fruits",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 900401,
+    "name": "Куриное филе",
+    "category": "Мясо",
+    "brand": "Петелинка",
+    "price": 389.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900402,
+    "name": "Куриные бедра",
+    "category": "Мясо",
+    "brand": "Петелинка",
+    "price": 249.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900403,
+    "name": "Куриные крылья",
+    "category": "Мясо",
+    "brand": "Петелинка",
+    "price": 199.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900404,
+    "name": "Говядина вырезка",
+    "category": "Мясо",
+    "brand": "Мираторг",
+    "price": 699.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900405,
+    "name": "Говядина для тушения",
+    "category": "Мясо",
+    "brand": "Мираторг",
+    "price": 549.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900406,
+    "name": "Свинина вырезка",
+    "category": "Мясо",
+    "brand": "Черкизово",
+    "price": 479.9,
+    "unit": "кг",
+    "size": 0.6,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900407,
+    "name": "Свинина шея",
+    "category": "Мясо",
+    "brand": "Черкизово",
+    "price": 429.9,
+    "unit": "кг",
+    "size": 0.8,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900408,
+    "name": "Фарш говяжий",
+    "category": "Мясо",
+    "brand": "Мираторг",
+    "price": 399.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900409,
+    "name": "Фарш свиной",
+    "category": "Мясо",
+    "brand": "Черкизово",
+    "price": 349.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900410,
+    "name": "Индейка филе",
+    "category": "Мясо",
+    "brand": "Индилайт",
+    "price": 449.9,
+    "unit": "кг",
+    "size": 0.6,
+    "tags": "meat|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900501,
+    "name": "Филе семги",
+    "category": "Рыба",
+    "brand": "Норвегия",
+    "price": 899.9,
+    "unit": "кг",
+    "size": 0.3,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900502,
+    "name": "Минтай филе",
+    "category": "Рыба",
+    "brand": "Русское море",
+    "price": 299.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900503,
+    "name": "Треска филе",
+    "category": "Рыба",
+    "brand": "Русское море",
+    "price": 399.9,
+    "unit": "кг",
+    "size": 0.4,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900504,
+    "name": "Креветки варено-мороженые",
+    "category": "Рыба",
+    "brand": "Vici",
+    "price": 799.9,
+    "unit": "кг",
+    "size": 0.3,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900505,
+    "name": "Кальмары кольца",
+    "category": "Рыба",
+    "brand": "Русское море",
+    "price": 449.9,
+    "unit": "кг",
+    "size": 0.3,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900506,
+    "name": "Сельдь соленая",
+    "category": "Рыба",
+    "brand": "Санта Бремор",
+    "price": 249.9,
+    "unit": "кг",
+    "size": 0.4,
+    "tags": "fish|protein",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900507,
+    "name": "Скумбрия копченая",
+    "category": "Рыба",
+    "brand": "Русское море",
+    "price": 349.9,
+    "unit": "кг",
+    "size": 0.3,
+    "tags": "fish|protein",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900508,
+    "name": "Форель радужная",
+    "category": "Рыба",
+    "brand": "Русский лосось",
+    "price": 699.9,
+    "unit": "кг",
+    "size": 0.4,
+    "tags": "fish|protein",
+    "components": [
+      "main_course"
+    ]
+  },
+  {
+    "id": 900601,
+    "name": "Молоко 3.2%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 89.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "dairy",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 900602,
+    "name": "Молоко 2.5%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 79.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "dairy",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 900603,
+    "name": "Кефир 2.5%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 69.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "dairy",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 900604,
+    "name": "Ряженка 4%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 79.9,
+    "unit": "л",
+    "size": 0.9,
+    "tags": "dairy",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 900605,
+    "name": "Творог 5%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 119.9,
+    "unit": "г",
+    "size": 300,
+    "tags": "dairy|protein",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900606,
+    "name": "Творог 9%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 139.9,
+    "unit": "г",
+    "size": 300,
+    "tags": "dairy|protein",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900607,
+    "name": "Сметана 15%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 79.9,
+    "unit": "г",
+    "size": 300,
+    "tags": "dairy",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900608,
+    "name": "Сметана 20%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 99.9,
+    "unit": "г",
+    "size": 300,
+    "tags": "dairy",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900609,
+    "name": "Йогурт натуральный",
+    "category": "Молочные продукты",
+    "brand": "Активиа",
+    "price": 59.9,
+    "unit": "г",
+    "size": 290,
+    "tags": "dairy",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900610,
+    "name": "Сыр Российский",
+    "category": "Молочные продукты",
+    "brand": "Карат",
+    "price": 599.9,
+    "unit": "кг",
+    "size": 0.2,
+    "tags": "dairy|protein",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900611,
+    "name": "Сыр Гауда",
+    "category": "Молочные продукты",
+    "brand": "Valio",
+    "price": 799.9,
+    "unit": "кг",
+    "size": 0.2,
+    "tags": "dairy|protein",
+    "components": [
+      "snack"
+    ]
+  },
+  {
+    "id": 900612,
+    "name": "Сливки 10%",
+    "category": "Молочные продукты",
+    "brand": "Простоквашино",
+    "price": 89.9,
+    "unit": "мл",
+    "size": 480,
+    "tags": "dairy",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900701,
+    "name": "Яйца куриные С1",
+    "category": "Яйца",
+    "brand": "Окское",
+    "price": 89.9,
+    "unit": "уп",
+    "size": 10,
+    "tags": "eggs|protein",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900702,
+    "name": "Яйца куриные С0",
+    "category": "Яйца",
+    "brand": "Окское",
+    "price": 119.9,
+    "unit": "уп",
+    "size": 10,
+    "tags": "eggs|protein",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 900801,
+    "name": "Хлеб белый",
+    "category": "Хлеб",
+    "brand": "Коломенское",
+    "price": 49.9,
+    "unit": "г",
+    "size": 400,
+    "tags": "bakery",
+    "components": [
+      "bakery"
+    ]
+  },
+  {
+    "id": 900802,
+    "name": "Хлеб черный",
+    "category": "Хлеб",
+    "brand": "Коломенское",
+    "price": 55.9,
+    "unit": "г",
+    "size": 400,
+    "tags": "bakery",
+    "components": [
+      "bakery"
+    ]
+  },
+  {
+    "id": 900803,
+    "name": "Батон нарезной",
+    "category": "Хлеб",
+    "brand": "Нива",
+    "price": 39.9,
+    "unit": "г",
+    "size": 350,
+    "tags": "bakery",
+    "components": [
+      "bakery"
+    ]
+  },
+  {
+    "id": 900901,
+    "name": "Масло подсолнечное",
+    "category": "Масло",
+    "brand": "Слобода",
+    "price": 149.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "oil",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900902,
+    "name": "Масло оливковое",
+    "category": "Масло",
+    "brand": "Borges",
+    "price": 449.9,
+    "unit": "мл",
+    "size": 500,
+    "tags": "oil",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900903,
+    "name": "Масло сливочное",
+    "category": "Масло",
+    "brand": "Простоквашино",
+    "price": 189.9,
+    "unit": "г",
+    "size": 180,
+    "tags": "dairy|oil",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900904,
+    "name": "Майонез Провансаль",
+    "category": "Соусы",
+    "brand": "Слобода",
+    "price": 89.9,
+    "unit": "мл",
+    "size": 400,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900905,
+    "name": "Кетчуп томатный",
+    "category": "Соусы",
+    "brand": "Heinz",
+    "price": 149.9,
+    "unit": "мл",
+    "size": 500,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900906,
+    "name": "Горчица столовая",
+    "category": "Соусы",
+    "brand": "Русский продукт",
+    "price": 39.9,
+    "unit": "мл",
+    "size": 200,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900907,
+    "name": "Соевый соус",
+    "category": "Соусы",
+    "brand": "Kikkoman",
+    "price": 249.9,
+    "unit": "мл",
+    "size": 250,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900908,
+    "name": "Уксус столовый 9%",
+    "category": "Соусы",
+    "brand": "Балтимор",
+    "price": 29.9,
+    "unit": "мл",
+    "size": 500,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900909,
+    "name": "Томатная паста",
+    "category": "Соусы",
+    "brand": "Помидорка",
+    "price": 79.9,
+    "unit": "г",
+    "size": 270,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 900910,
+    "name": "Аджика острая",
+    "category": "Соусы",
+    "brand": "Кинто",
+    "price": 119.9,
+    "unit": "г",
+    "size": 270,
+    "tags": "sauce",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901001,
+    "name": "Соль поваренная",
+    "category": "Специи",
+    "brand": "Экстра",
+    "price": 19.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "spices",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901002,
+    "name": "Перец черный молотый",
+    "category": "Специи",
+    "brand": "Kamis",
+    "price": 89.9,
+    "unit": "г",
+    "size": 50,
+    "tags": "spices",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901003,
+    "name": "Лавровый лист",
+    "category": "Специи",
+    "brand": "Kamis",
+    "price": 59.9,
+    "unit": "г",
+    "size": 10,
+    "tags": "spices",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901004,
+    "name": "Паприка молотая",
+    "category": "Специи",
+    "brand": "Kamis",
+    "price": 99.9,
+    "unit": "г",
+    "size": 40,
+    "tags": "spices",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901005,
+    "name": "Куркума",
+    "category": "Специи",
+    "brand": "Kamis",
+    "price": 119.9,
+    "unit": "г",
+    "size": 30,
+    "tags": "spices",
+    "components": [
+      "sauce"
+    ]
+  },
+  {
+    "id": 901006,
+    "name": "Корица молотая",
+    "category": "Специи",
+    "brand": "Kamis",
+    "price": 129.9,
+    "unit": "г",
+    "size": 30,
+    "tags": "spices",
+    "components": [
+      "dessert"
+    ]
+  },
+  {
+    "id": 901007,
+    "name": "Ванилин",
+    "category": "Специи",
+    "brand": "Haas",
+    "price": 29.9,
+    "unit": "г",
+    "size": 10,
+    "tags": "spices",
+    "components": [
+      "dessert"
+    ]
+  },
+  {
+    "id": 901008,
+    "name": "Сахар-песок",
+    "category": "Сахар",
+    "brand": "Русский",
+    "price": 69.9,
+    "unit": "кг",
+    "size": 1.0,
+    "tags": "sugar",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 901009,
+    "name": "Сахар коричневый",
+    "category": "Сахар",
+    "brand": "Мистраль",
+    "price": 159.9,
+    "unit": "кг",
+    "size": 0.5,
+    "tags": "sugar",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 901010,
+    "name": "Мед натуральный",
+    "category": "Сахар",
+    "brand": "Мёд Алтая",
+    "price": 399.9,
+    "unit": "г",
+    "size": 500,
+    "tags": "sugar",
+    "components": [
+      "breakfast"
+    ]
+  },
+  {
+    "id": 901101,
+    "name": "Чай черный",
+    "category": "Напитки",
+    "brand": "Lipton",
+    "price": 149.9,
+    "unit": "г",
+    "size": 100,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901102,
+    "name": "Чай зеленый",
+    "category": "Напитки",
+    "brand": "Greenfield",
+    "price": 179.9,
+    "unit": "г",
+    "size": 100,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901103,
+    "name": "Кофе молотый",
+    "category": "Напитки",
+    "brand": "Lavazza",
+    "price": 499.9,
+    "unit": "г",
+    "size": 250,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901104,
+    "name": "Кофе растворимый",
+    "category": "Напитки",
+    "brand": "Nescafe",
+    "price": 449.9,
+    "unit": "г",
+    "size": 190,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901105,
+    "name": "Сок апельсиновый",
+    "category": "Напитки",
+    "brand": "Добрый",
+    "price": 119.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901106,
+    "name": "Сок яблочный",
+    "category": "Напитки",
+    "brand": "Добрый",
+    "price": 99.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901107,
+    "name": "Вода минеральная",
+    "category": "Напитки",
+    "brand": "Боржоми",
+    "price": 89.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901108,
+    "name": "Вода питьевая",
+    "category": "Напитки",
+    "brand": "Архыз",
+    "price": 49.9,
+    "unit": "л",
+    "size": 5.0,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901109,
+    "name": "Газировка Кола",
+    "category": "Напитки",
+    "brand": "Coca-Cola",
+    "price": 79.9,
+    "unit": "л",
+    "size": 1.5,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  },
+  {
+    "id": 901110,
+    "name": "Морс клюквенный",
+    "category": "Напитки",
+    "brand": "Русский дар",
+    "price": 129.9,
+    "unit": "л",
+    "size": 1.0,
+    "tags": "beverage",
+    "components": [
+      "beverage"
+    ]
+  }
+]
