@@ -1,0 +1,5 @@
+outs:
+- md5: 7ca166cd44f91e25b5d23e0d8b87600a
+  size: 14224086
+  hash: md5
+  path: russian_supermarket_prices.csv
