@@ -72,8 +72,16 @@ def build_manual_prompt(user_query: str) -> str:
 
 ВСЕГДА вызывай функцию parse_basket_query для ЛЮБОГО запроса о еде или корзине.
 
+ВАЖНО: Используй ТОЛЬКО JSON-синтаксис:
+- Для boolean: true/false (НЕ True/False)
+- Для null: null (НЕ None)
+- Все строки в двойных кавычках
+
 ФОРМАТ ОТВЕТА (строго следуй этому):
 Вызов функции: {{"name": "parse_basket_query", "arguments": {{...}}}}
+
+Пример правильного ответа:
+Вызов функции: {{"name": "parse_basket_query", "arguments": {{"people": 2, "prefer_quick": true}}}}
 
 Доступная функция: {json.dumps(function_schema, ensure_ascii=False)}
 
@@ -86,8 +94,13 @@ def extract_function_call(generated_text: str) -> Optional[Dict[str, Any]]:
     """
     Извлекает JSON из ответа модели.
     """
+    def normalize_json(json_str: str) -> str:
+        """Заменяет Python boolean на JSON boolean"""
+        json_str = re.sub(r'\bTrue\b', 'true', json_str)
+        json_str = re.sub(r'\bFalse\b', 'false', json_str)
+        json_str = re.sub(r'\bNone\b', 'null', json_str)
+        return json_str
     
-    # Паттерн 1: "Вызов функции: {...}"
     pattern1 = r'Вызов функции:\s*(\{.*?\})(?:\s*<end_of_turn>|$)'
     match = re.search(pattern1, generated_text, re.DOTALL)
     
@@ -100,7 +113,6 @@ def extract_function_call(generated_text: str) -> Optional[Dict[str, Any]]:
         except json.JSONDecodeError as e:
             print(f"[ERROR] JSONDecodeError (pattern1): {e}")
     
-    # Паттерн 2: "Вызов функции {...}" (без двоеточия)
     pattern2 = r'Вызов функции\s+(\{.*?\})(?:\s*<end_of_turn>|$)'
     match = re.search(pattern2, generated_text, re.DOTALL)
     
@@ -113,7 +125,6 @@ def extract_function_call(generated_text: str) -> Optional[Dict[str, Any]]:
         except json.JSONDecodeError as e:
             print(f"[ERROR] JSONDecodeError (pattern2): {e}")
     
-    # Паттерн 3: "Вызов функции parse_basket_query с параметрами: {...}"
     pattern3 = r'Вызов функции\s+parse_basket_query\s+с параметрами:\s*(\{.*?\})(?:\s*<end_of_turn>|$)'
     match = re.search(pattern3, generated_text, re.DOTALL)
     
@@ -129,8 +140,7 @@ def extract_function_call(generated_text: str) -> Optional[Dict[str, Any]]:
             print(f"[ERROR] JSONDecodeError (pattern3): {e}")
     
     # Паттерн 4: Поиск с подсчётом скобок
-    match = re.search(r'\{[^{]*?"name"\s*:\s*"parse_basket_query"', generated_text, re.DOTALL)
-    
+    match = re.search(r'\{[^{]*?"name"\s*:\s*"parse_basket_query"', generated_text, re.DOTALL)    
     if match:
         try:
             start_pos = match.start()
@@ -147,6 +157,7 @@ def extract_function_call(generated_text: str) -> Optional[Dict[str, Any]]:
                         break
             
             json_str = generated_text[start_pos:end_pos]
+            json_str = normalize_json(match.group(1))
             function_call = json.loads(json_str)
             return function_call
         except (json.JSONDecodeError, ValueError) as e:
@@ -238,8 +249,8 @@ def test_parser():
     
     test_queries = [
         "Ужин на двоих за 1500 рублей",
-        "Веганский завтрак на троих",
-        "Обед без молочки и рыбы",
+        "Веганский завтрак на троих быстрый",
+        "Обед без молочки и рыбы подешевле",
         "Быстрый перекус на 500 рублей"
     ]
     

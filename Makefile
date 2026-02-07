@@ -33,3 +33,6 @@ rebuild-embeddings:
 add-mocks:
 	uv run python -m src.scripts.prepare_db --step mocks
 	uv run python -m src.scripts.build_embeddings --mocks-only
+
+test-search:
+	uv run python -m src.agents.compatibility.product_searcher
