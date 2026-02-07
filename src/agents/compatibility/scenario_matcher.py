@@ -1,38 +1,66 @@
 """
-Модуль для выбора сценария блюда на основе запроса пользователя.
+Модуль для УМНОГО выбора сценария блюда на основе запроса пользователя.
 
-Основные функции:
-- Загрузка сценариев из scenarios.json
-- Фильтрация по meal_type, времени приготовления, количеству порций
-- Выбор оптимального сценария (случайный или по приоритету)
-- Масштабирование ингредиентов под количество людей
+Новые возможности:
+- Фильтрация по exclude_tags (без молока, без мяса)
+- Приоритизация по include_tags (веганское, халяль)
+- Scoring система (учитывает время, стоимость, соответствие запросу)
+- Поддержка "быстро/дешево"
 
 Использование:
     matcher = ScenarioMatcher()
     scenario = matcher.match(
         meal_types=["dinner"],
         people=3,
-        max_time_min=30
+        exclude_tags=["dairy", "meat"],
+        include_tags=["vegan"],
+        prefer_quick=True
     )
 """
 
 import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 import random
 from copy import deepcopy
-
 
 # ==================== КОНФИГУРАЦИЯ ====================
 
 SCENARIOS_PATH = Path("data/scenarios.json")
 
+# Маппинг тегов на ключевые слова в ингредиентах
+TAG_KEYWORDS = {
+    'dairy': ['молоко', 'сыр', 'творог', 'сметана', 'кефир', 'йогурт', 'ряженка', 'масло сливочное'],
+    'meat': ['курица', 'говядина', 'свинина', 'баранина', 'мясо', 'фарш', 'колбаса', 'сосиски'],
+    'fish': ['рыба', 'лосось', 'треска', 'тунец', 'морепродукты', 'креветки'],
+    'gluten': ['мука', 'хлеб', 'макароны', 'паста', 'лапша', 'булка'],
+    'no_sugar': ['сахар', 'мёд', 'шоколад', 'варенье'],
+    'alcohol': ['вино', 'пиво', 'водка', 'коньяк'],
+    
+    # Позитивные теги (что ДОЛЖНО быть)
+    'vegan': ['овощи', 'фрукты', 'крупа', 'бобовые', 'нут', 'чечевица', 'тофу'],
+    'vegetarian': ['овощи', 'фрукты', 'яйца', 'молоко', 'сыр'],
+    'halal': ['курица', 'говядина', 'баранина', 'овощи', 'крупа'],
+    'children_goods': ['каша', 'молоко', 'фрукты', 'йогурт']
+}
+
+# Примерная стоимость категорий (для быстрой оценки "дешево/дорого")
+INGREDIENT_COST_ESTIMATE = {
+    'курица': 500,
+    'говядина': 600,
+    'рыба': 800,
+    'овощи': 300,
+    'крупа': 180,
+    'молоко': 190,
+    'сыр': 900,
+    'фрукты': 500
+}
 
 # ==================== КЛАСС ScenarioMatcher ====================
 
 class ScenarioMatcher:
     """
-    Класс для выбора сценария блюда из библиотеки сценариев.
+    Класс для УМНОГО выбора сценария блюда из библиотеки сценариев.
     """
     
     def __init__(self, scenarios_path: Path = SCENARIOS_PATH):
@@ -46,11 +74,8 @@ class ScenarioMatcher:
         self.scenarios = []
         self._load_scenarios()
     
-    
     def _load_scenarios(self):
-        """
-        Загружает сценарии из JSON файла.
-        """
+        """Загружает сценарии из JSON файла."""
         if not self.scenarios_path.exists():
             raise FileNotFoundError(
                 f"Файл сценариев не найден: {self.scenarios_path}\n"
@@ -67,7 +92,7 @@ class ScenarioMatcher:
         
         print(f"📚 Загружено {len(self.scenarios)} сценариев")
         
-        # Выводим статистику по meal_types
+        # Статистика
         meal_type_counts = {}
         for scenario in self.scenarios:
             meal_type = scenario.get('meal_type', 'unknown')
@@ -77,119 +102,203 @@ class ScenarioMatcher:
         for meal_type, count in sorted(meal_type_counts.items()):
             print(f"     - {meal_type}: {count}")
     
-    
-    def _filter_scenarios(
-        self,
-        meal_types: Optional[List[str]] = None,
-        max_time_min: Optional[int] = None,
-        min_serves: Optional[int] = None
-    ) -> List[Dict]:
+    def _check_ingredient_has_tag(self, ingredient_name: str, tag: str) -> bool:
         """
-        Фильтрует сценарии по заданным критериям.
+        Проверяет, содержит ли ингредиент указанный тег.
         
         Args:
-            meal_types: Список типов приемов пищи (breakfast, lunch, dinner, snack)
-            max_time_min: Максимальное время приготовления в минутах
-            min_serves: Минимальное базовое количество порций
+            ingredient_name: Название ингредиента (например, "молоко")
+            tag: Тег для проверки (например, "dairy")
+        
+        Returns:
+            bool: True если ингредиент содержит этот тег
+        """
+        ingredient_lower = ingredient_name.lower()
+        
+        keywords = TAG_KEYWORDS.get(tag, [])
+        
+        for keyword in keywords:
+            if keyword in ingredient_lower:
+                return True
+        
+        return False
+    
+    def _filter_by_tags(
+        self,
+        scenarios: List[Dict],
+        exclude_tags: List[str],
+        include_tags: List[str]
+    ) -> List[Dict]:
+        """
+        Фильтрует сценарии по exclude_tags и include_tags.
+        
+        Args:
+            scenarios: Список сценариев
+            exclude_tags: Теги для исключения (например, ["dairy", "meat"])
+            include_tags: Теги для включения (например, ["vegan"])
         
         Returns:
             List[Dict]: Отфильтрованные сценарии
         """
-        filtered = self.scenarios.copy()
+        filtered = []
         
-        # Фильтр по meal_type
-        if meal_types:
-            filtered = [
-                s for s in filtered
-                if s.get('meal_type') in meal_types
-            ]
-        
-        # Фильтр по времени приготовления
-        if max_time_min is not None:
-            filtered = [
-                s for s in filtered
-                if s.get('estimated_time_min', 999) <= max_time_min
-            ]
-        
-        # Фильтр по базовому количеству порций
-        if min_serves is not None:
-            filtered = [
-                s for s in filtered
-                if s.get('serves_base', 1) >= min_serves
-            ]
+        for scenario in scenarios:
+            components = scenario.get('components', [])
+            
+            # 1. Проверка exclude_tags (если хотя бы один ингредиент содержит запрещённый тег - убираем сценарий)
+            has_excluded = False
+            for component in components:
+                ingredient = component.get('ingredient', '')
+                
+                for exclude_tag in exclude_tags:
+                    if self._check_ingredient_has_tag(ingredient, exclude_tag):
+                        has_excluded = True
+                        break
+                
+                if has_excluded:
+                    break
+            
+            if has_excluded:
+                continue  # Этот сценарий не подходит
+            
+            # 2. Проверка include_tags (если указаны - хотя бы один ингредиент должен содержать нужный тег)
+            if include_tags:
+                has_included = False
+                for component in components:
+                    ingredient = component.get('ingredient', '')
+                    
+                    for include_tag in include_tags:
+                        if self._check_ingredient_has_tag(ingredient, include_tag):
+                            has_included = True
+                            break
+                    
+                    if has_included:
+                        break
+                
+                if not has_included:
+                    continue  # Этот сценарий не содержит нужных ингредиентов
+            
+            # Сценарий прошёл фильтрацию
+            filtered.append(scenario)
         
         return filtered
     
-    
-    def _scale_scenario(self, scenario: Dict, people: int) -> Dict:
+    def _compute_scenario_score(
+        self,
+        scenario: Dict,
+        prefer_quick: bool = False,
+        prefer_cheap: bool = False,
+        include_tags: List[str] = None
+    ) -> float:
         """
-        Масштабирует количество ингредиентов в сценарии под количество людей.
+        Вычисляет score сценария на основе предпочтений.
         
         Args:
-            scenario: Исходный сценарий
-            people: Количество человек
+            scenario: Сценарий
+            prefer_quick: Приоритет на быстрое приготовление
+            prefer_cheap: Приоритет на дешевизну
+            include_tags: Теги для бонусов
         
         Returns:
-            Dict: Сценарий с пересчитанными количествами
+            float: Score (чем выше, тем лучше)
         """
-        # Создаем глубокую копию, чтобы не изменять оригинал
-        scaled_scenario = deepcopy(scenario)
+        score = 1.0  # Базовый score
         
-        serves_base = scenario.get('serves_base', 1)
-        scale_factor = people / serves_base
-        
-        # Масштабируем каждый ингредиент
-        for component in scaled_scenario.get('components', []):
-            original_quantity = component['quantity_per_person']
+        # 1. Бонус за быстроту (если prefer_quick=True)
+        if prefer_quick:
+            time_min = scenario.get('estimated_time_min', 60)
             
-            # Пересчитываем количество
-            # Округляем до разумных значений
-            scaled_quantity = original_quantity * scale_factor
-            
-            # Округление в зависимости от величины
-            if scaled_quantity < 10:
-                # Для маленьких значений (специи) - до целых
-                scaled_quantity = round(scaled_quantity)
-            elif scaled_quantity < 100:
-                # Для средних значений - до 5г/мл
-                scaled_quantity = round(scaled_quantity / 5) * 5
+            if time_min <= 15:
+                score += 0.5  # Очень быстро
+            elif time_min <= 30:
+                score += 0.3  # Быстро
+            elif time_min <= 45:
+                score += 0.1  # Средне
             else:
-                # Для больших значений - до 10г/мл
-                scaled_quantity = round(scaled_quantity / 10) * 10
+                score -= 0.2  # Долго
+        
+        # 2. Бонус за дешевизну (если prefer_cheap=True)
+        if prefer_cheap:
+            components = scenario.get('components', [])
             
-            component['quantity_scaled'] = max(scaled_quantity, 1)  # Минимум 1
+            # Примерная оценка стоимости на основе ингредиентов
+            estimated_cost = 0
+            for component in components:
+                ingredient_lower = component.get('ingredient', '').lower()
+                
+                # Ищем примерную стоимость
+                for key, cost in INGREDIENT_COST_ESTIMATE.items():
+                    if key in ingredient_lower:
+                        estimated_cost += cost
+                        break
+                else:
+                    # Если не нашли - предполагаем среднюю стоимость
+                    estimated_cost += 150
+            
+            # Чем дешевле - тем лучше
+            if estimated_cost < 500:
+                score += 0.4
+            elif estimated_cost < 800:
+                score += 0.2
+            elif estimated_cost > 1200:
+                score -= 0.2
         
-        scaled_scenario['scaled_for_people'] = people
-        scaled_scenario['scale_factor'] = scale_factor
+        # 3. Бонус за соответствие include_tags
+        if include_tags:
+            components = scenario.get('components', [])
+            
+            matches = 0
+            for component in components:
+                ingredient = component.get('ingredient', '')
+                
+                for include_tag in include_tags:
+                    if self._check_ingredient_has_tag(ingredient, include_tag):
+                        matches += 1
+                        break
+            
+            # Чем больше совпадений - тем выше score
+            score += 0.1 * matches
         
-        return scaled_scenario
-    
+        # 4. Штраф за слишком много ингредиентов (сложность)
+        num_components = len(scenario.get('components', []))
+        if num_components > 10:
+            score -= 0.2
+        
+        return score
     
     def match(
         self,
         meal_types: Optional[List[str]] = None,
         people: int = 1,
         max_time_min: Optional[int] = None,
-        strategy: str = "random"
+        exclude_tags: Optional[List[str]] = None,
+        include_tags: Optional[List[str]] = None,
+        prefer_quick: bool = False,
+        prefer_cheap: bool = False,
+        strategy: str = "smart"
     ) -> Optional[Dict]:
         """
-        Выбирает подходящий сценарий на основе критериев.
+        УМНЫЙ выбор сценария на основе запроса пользователя.
         
         Args:
             meal_types: Типы приемов пищи (например, ["dinner"])
             people: Количество человек
             max_time_min: Максимальное время приготовления
+            exclude_tags: Теги для исключения (["dairy", "meat"])
+            include_tags: Теги для включения (["vegan"])
+            prefer_quick: Приоритет на быстрое приготовление
+            prefer_cheap: Приоритет на дешевизну
             strategy: Стратегия выбора:
+                - "smart" (по умолчанию) - выбирает сценарий с максимальным score
                 - "random" - случайный из подходящих
                 - "fastest" - самый быстрый
                 - "simplest" - с минимумом ингредиентов
-                - "first" - первый подходящий
         
         Returns:
             Dict: Выбранный сценарий с масштабированными количествами
                   или None если не найдено подходящих
         """
-        # 1. Фильтруем сценарии
+        # 1. Базовая фильтрация по meal_types и времени
         candidates = self._filter_scenarios(
             meal_types=meal_types,
             max_time_min=max_time_min
@@ -199,8 +308,44 @@ class ScenarioMatcher:
             print(f"⚠️  Не найдено сценариев для meal_types={meal_types}, max_time={max_time_min}")
             return None
         
-        # 2. Выбираем сценарий по стратегии
-        if strategy == "random":
+        print(f"   🔍 После базовой фильтрации: {len(candidates)} сценариев")
+        
+        # 2. Фильтрация по exclude_tags и include_tags
+        if exclude_tags or include_tags:
+            candidates = self._filter_by_tags(
+                scenarios=candidates,
+                exclude_tags=exclude_tags or [],
+                include_tags=include_tags or []
+            )
+            
+            print(f"   🏷️  После фильтрации по тегам: {len(candidates)} сценариев")
+            
+            if not candidates:
+                print(f"   ⚠️  Не найдено сценариев с учётом exclude_tags={exclude_tags}, include_tags={include_tags}")
+                return None
+        
+        # 3. Выбор сценария по стратегии
+        if strategy == "smart":
+            # Вычисляем score для каждого сценария
+            scored_scenarios = []
+            for scenario in candidates:
+                score = self._compute_scenario_score(
+                    scenario=scenario,
+                    prefer_quick=prefer_quick,
+                    prefer_cheap=prefer_cheap,
+                    include_tags=include_tags or []
+                )
+                scored_scenarios.append((scenario, score))
+            
+            # Сортируем по убыванию score
+            scored_scenarios.sort(key=lambda x: x[1], reverse=True)
+            
+            # Берём топ-1
+            selected, best_score = scored_scenarios[0]
+            
+            print(f"   ⭐ Выбран сценарий с score={best_score:.2f}: {selected['name']}")
+        
+        elif strategy == "random":
             selected = random.choice(candidates)
         
         elif strategy == "fastest":
@@ -209,19 +354,62 @@ class ScenarioMatcher:
         elif strategy == "simplest":
             selected = min(candidates, key=lambda s: len(s.get('components', [])))
         
-        elif strategy == "first":
-            selected = candidates[0]
-        
         else:
-            print(f"⚠️  Неизвестная стратегия '{strategy}', используется 'random'")
+            print(f"⚠️  Неизвестная стратегия '{strategy}', используется 'smart'")
             selected = random.choice(candidates)
         
-        # 3. Масштабируем под количество людей
+        # 4. Масштабируем под количество людей
         scaled_scenario = self._scale_scenario(selected, people)
         
         return scaled_scenario
     
+    def _filter_scenarios(
+        self,
+        meal_types: Optional[List[str]] = None,
+        max_time_min: Optional[int] = None,
+        min_serves: Optional[int] = None
+    ) -> List[Dict]:
+        """Базовая фильтрация сценариев (без изменений)."""
+        filtered = self.scenarios.copy()
+        
+        if meal_types:
+            filtered = [s for s in filtered if s.get('meal_type') in meal_types]
+        
+        if max_time_min is not None:
+            filtered = [s for s in filtered if s.get('estimated_time_min', 999) <= max_time_min]
+        
+        if min_serves is not None:
+            filtered = [s for s in filtered if s.get('serves_base', 1) >= min_serves]
+        
+        return filtered
     
+    def _scale_scenario(self, scenario: Dict, people: int) -> Dict:
+        """Масштабирует количество ингредиентов (без изменений)."""
+        scaled_scenario = deepcopy(scenario)
+        
+        serves_base = scenario.get('serves_base', 1)
+        scale_factor = people / serves_base
+        
+        for component in scaled_scenario.get('components', []):
+            original_quantity = component['quantity_per_person']
+            scaled_quantity = original_quantity * scale_factor
+            
+            if scaled_quantity < 10:
+                scaled_quantity = round(scaled_quantity)
+            elif scaled_quantity < 100:
+                scaled_quantity = round(scaled_quantity / 5) * 5
+            else:
+                scaled_quantity = round(scaled_quantity / 10) * 10
+            
+            component['quantity_scaled'] = max(scaled_quantity, 1)
+        
+        scaled_scenario['scaled_for_people'] = people
+        scaled_scenario['scale_factor'] = scale_factor
+        
+        return scaled_scenario
+    
+    # ... (остальные методы без изменений: get_scenario_by_id, get_all_scenarios, get_scenario_summary)
+
     def get_scenario_by_id(self, scenario_id: str, people: int = 1) -> Optional[Dict]:
         """
         Получает сценарий по его ID.

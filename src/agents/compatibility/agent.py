@@ -52,29 +52,10 @@ class CompatibilityAgent:
     def generate_basket(
         self,
         parsed_query: Dict,
-        strategy: str = "random"
+        strategy: str = "smart"  # ← Изменили default
     ) -> Dict:
         """
-        Генерирует корзину товаров.
-        
-        Args:
-            parsed_query: {
-                'meal_types': ['dinner'],
-                'people': 2,
-                'budget_rub': 1500,
-                'exclude_tags': [],
-                'include_tags': []
-            }
-            strategy: Стратегия выбора сценария
-        
-        Returns:
-            Dict: {
-                'success': bool,
-                'basket': [...],
-                'total_price': float,
-                'scenario_used': {...},
-                'compatibility_score': float
-            }
+        Генерирует корзину товаров с учётом предпочтений пользователя.
         """
         
         meal_types = parsed_query.get('meal_types', ['dinner'])
@@ -84,25 +65,38 @@ class CompatibilityAgent:
         include_tags = parsed_query.get('include_tags', [])
         
         # ============================================
-        # ШАГ 1: Выбираем сценарий
+        # ШАГ 1: УМНЫЙ выбор сценария
         # ============================================
+        
+        max_time_min = parsed_query.get('max_time_min')
+        prefer_quick = parsed_query.get('prefer_quick', False)
+        prefer_cheap = parsed_query.get('prefer_cheap', False)
+        if prefer_cheap == False:
+            prefer_cheap = budget_rub is not None and budget_rub < 1000  # Если бюджет < 1000₽ - ищем дешёвое
+        
         scenario = self.scenario_matcher.match(
             meal_types=meal_types,
             people=people,
-            strategy=strategy
+            max_time_min=max_time_min,
+            exclude_tags=exclude_tags,
+            include_tags=include_tags,
+            prefer_quick=prefer_quick,
+            prefer_cheap=prefer_cheap,
+            strategy="smart"
         )
-        
+    
         if not scenario:
             return {
                 'success': False,
-                'message': f'Не найдено сценариев для {meal_types}',
+                'message': f'Не найдено сценариев для {meal_types} с тегами exclude={exclude_tags}, include={include_tags}',
                 'basket': [],
                 'total_price': 0
             }
         
         print(f"\n✅ Выбран сценарий: {scenario['name']}")
-        print(f"   Ингредиентов: {len(scenario['components'])}")
-        
+        print(f"   Учтены exclude_tags: {exclude_tags}")
+        print(f"   Учтены include_tags: {include_tags}")
+
         # ============================================
         # ШАГ 2: Ищем товары для каждого ингредиента
         # ============================================
@@ -199,17 +193,17 @@ class CompatibilityAgent:
 # ==================== ТЕСТИРОВАНИЕ ====================
 
 def test_agent():
-    """Тестирует работу CompatibilityAgent."""
+    """Тестирует работу CompatibilityAgent с умным выбором сценариев и тегами."""
     print("\n" + "=" * 70)
     print("🧪 ТЕСТИРОВАНИЕ CompatibilityAgent")
     print("=" * 70)
     
     agent = CompatibilityAgent()
     
-    # Тест 1: Ужин на двоих
-    print("\n📝 Тест 1: Ужин на двоих за 1500₽")
+    # ---------------- Тест 1: базовый ужин ----------------
+    print("\n📝 Тест 1: Ужин на двоих за 1500₽ (без ограничений)")
     
-    query = {
+    query1 = {
         'meal_types': ['dinner'],
         'people': 2,
         'budget_rub': 1500,
@@ -217,21 +211,88 @@ def test_agent():
         'include_tags': []
     }
     
-    result = agent.generate_basket(query)
+    result1 = agent.generate_basket(query1, strategy="smart")
     
     print(f"\n{'='*70}")
-    print("РЕЗУЛЬТАТ:")
+    print("РЕЗУЛЬТАТ ТЕСТА 1:")
     print(f"{'='*70}")
-    print(f"Успех: {result['success']}")
-    print(f"Товаров: {len(result['basket'])}")
-    print(f"Итого: {result['total_price']}₽")
-    print(f"Совместимость: {result['compatibility_score']}")
-    print(f"В рамках бюджета: {result['within_budget']}")
+    print(f"Успех: {result1['success']}")
+    print(f"Сценарий: {result1['scenario_used']['name']}")
+    print(f"Товаров: {len(result1['basket'])}")
+    print(f"Итого: {result1['total_price']}₽")
+    print(f"Совместимость: {result1['compatibility_score']}")
+    print(f"В рамках бюджета: {result1['within_budget']}")
     
-    print(f"\n📋 Корзина:")
-    for item in result['basket']:
+    print(f"\n📋 Корзина (первые 5 товаров):")
+    for item in result1['basket'][:5]:
         print(f"   - {item['product_name']}: {item['total_price']:.2f}₽ "
               f"({item['quantity_needed']}{item['quantity_unit']})")
+    if len(result1['basket']) > 5:
+        print(f"   ... и ещё {len(result1['basket']) - 5} товаров")
+    
+    # ---------------- Тест 2: ужин без молочки ----------------
+    print("\n📝 Тест 2: Ужин без молочных продуктов (exclude_tags=['dairy'])")
+    
+    query2 = {
+        'meal_types': ['dinner'],
+        'people': 2,
+        'budget_rub': 1500,
+        'exclude_tags': ['dairy'],
+        'include_tags': []
+    }
+    
+    result2 = agent.generate_basket(query2, strategy="smart")
+    
+    print(f"\n{'='*70}")
+    print("РЕЗУЛЬТАТ ТЕСТА 2:")
+    print(f"{'='*70}")
+    print(f"Успех: {result2['success']}")
+    if result2['success']:
+        print(f"Сценарий: {result2['scenario_used']['name']}")
+        print(f"Товаров: {len(result2['basket'])}")
+        print(f"Итого: {result2['total_price']}₽")
+        
+        dairy_keywords = ['молоко', 'сыр', 'творог', 'сметана',
+                          'кефир', 'йогурт', 'ряженка', 'сливки']
+        has_dairy = False
+        for item in result2['basket']:
+            name_lower = item['product_name'].lower()
+            if any(k in name_lower for k in dairy_keywords):
+                print(f"   ⚠ Найден молочный продукт: {item['product_name']}")
+                has_dairy = True
+        
+        if not has_dairy:
+            print("   ✅ Молочных продуктов нет (exclude_tags отработали корректно)")
+    
+    # ---------------- Тест 3: веганский ужин ----------------
+    print("\n📝 Тест 3: Веганский ужин (без мяса, рыбы, молочки, include_tags=['vegan'])")
+    
+    query3 = {
+        'meal_types': ['dinner'],
+        'people': 2,
+        'budget_rub': 1200,
+        'exclude_tags': ['meat', 'fish', 'dairy'],
+        'include_tags': ['vegan']
+    }
+    
+    result3 = agent.generate_basket(query3, strategy="smart")
+    
+    print(f"\n{'='*70}")
+    print("РЕЗУЛЬТАТ ТЕСТА 3:")
+    print(f"{'='*70}")
+    print(f"Успех: {result3['success']}")
+    if result3['success']:
+        print(f"Сценарий: {result3['scenario_used']['name']}")
+        print(f"Товаров: {len(result3['basket'])}")
+        print(f"Итого: {result3['total_price']}₽")
+    
+    print("\n" + "=" * 70)
+    print("✅ Тестирование завершено")
+    print("=" * 70)
+
+
+if __name__ == "__main__":
+    test_agent()
 
 
 if __name__ == "__main__":

@@ -51,6 +51,18 @@ def build_manual_prompt(user_query: str) -> str:
                     "type": "array",
                     "items": {"type": "string"},
                     "description": "Продукты, которые ОБЯЗАТЕЛЬНО должны быть. 'веган' -> ['vegan'], 'халяль' -> ['halal'], 'детское' -> ['children_goods']. Если не указано, возвращай пустой массив []."
+                },
+                "max_time_min": {
+                    "type": "integer",
+                    "description": "Максимальное время приготовления в минутах. 'за 30 минут' -> 30, 'максимум час' -> 60, 'быстрый ужин' -> 30."
+                },
+                "prefer_quick": {
+                    "type": "boolean",
+                    "description": "True, если пользователь просит быстрое блюдо: 'быстро', 'на скорую руку', 'быстрый ужин'."
+                },
+                "prefer_cheap": {
+                    "type": "boolean",
+                    "description": "True, если пользователь просит дешево/бюджетно: 'дешево', 'недорого', 'бюджетно', 'подешевле'."
                 }
             }
         }
@@ -181,7 +193,10 @@ def parse_query_with_function_calling(user_query: str) -> Dict[str, Any]:
             "horizon": None,
             "meal_type": args.get("meal_types", []),
             "exclude_tags": args.get("exclude_tags", []),
-            "include_tags": args.get("include_tags", [])
+            "include_tags": args.get("include_tags", []),
+            "max_time_min": args.get("max_time_min"),
+            "prefer_quick": args.get("prefer_quick", False),
+            "prefer_cheap": args.get("prefer_cheap", False),
         }
         
         if args.get("horizon_value") and args.get("horizon_unit"):
@@ -208,7 +223,11 @@ def _empty_result(user_query: str) -> Dict[str, Any]:
         "horizon": None,
         "meal_type": [],
         "exclude_tags": [],
-        "include_tags": []
+        "include_tags": [],
+        "max_time_min": None,
+        "prefer_quick": False,
+        "prefer_cheap": False,
+
     }
 
 def test_parser():
