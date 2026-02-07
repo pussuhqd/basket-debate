@@ -36,3 +36,6 @@ add-mocks:
 
 test-search:
 	uv run python -m src.agents.compatibility.product_searcher
+
+test-cmp:
+	uv run python -m src.agents.compatibility.agent

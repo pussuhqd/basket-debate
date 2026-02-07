@@ -636,3 +636,45 @@ html, body {
   margin: 12px 0 0 0;
   font-weight: 500;
 }
+/* Блок с детализацией цены */
+.product-pricing {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.price-row.total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+.price-label {
+  color: #6c757d;
+}
+
+.price-value {
+  color: #212529;
+  font-weight: 500;
+}
+
+.price-value.big {
+  font-size: 1.2rem;
+  color: #28a745;
+}
+
+.score {
+  padding: 4px 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}

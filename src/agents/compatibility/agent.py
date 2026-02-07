@@ -170,7 +170,10 @@ class CompatibilityAgent:
             basket.append(basket_item)
             total_price += basket_item['total_price']
             
-            print(f"   ✅ {basket_item['name']}: {basket_item['total_price']:.2f}₽")
+            print(f"   ✅ {basket_item['name']}")
+            print(f"      💰 Цена: {basket_item['price_per_unit']:.2f}₽/{basket_item['unit']}")
+            print(f"      📦 Нужно: {basket_item['quantity']:.2f}{basket_item['unit']}")
+            print(f"      💵 Итого: {basket_item['total_price']:.2f}₽")
         
         # ============================================
         # ШАГ 3: Оценка совместимости
@@ -240,11 +243,29 @@ def test_agent():
     
     print(f"\n📋 Корзина (первые 5 товаров):")
     for item in result1['basket'][:5]:
-        print(f"   - {item['name']}: {item['total_price']:.2f}₽ "
-              f"({item['quantity']}{item['unit']})")
+        print(f"   • {item['name']}")
+        print(f"     {item['quantity']:.2f}{item['unit']} × {item['price_per_unit']:.2f}₽/{item['unit']} = {item['total_price']:.2f}₽")
     if len(result1['basket']) > 5:
         print(f"   ... и ещё {len(result1['basket']) - 5} товаров")
     
+        print(f"\n{'='*70}")
+    print("🧾 ДЕТАЛИЗИРОВАННЫЙ ЧЕК")
+    print(f"{'='*70}")
+    
+    for i, item in enumerate(result1['basket'], 1):
+        print(f"\n{i}. {item['name']}")
+        print(f"   Роль: {item.get('ingredient_role', 'N/A')}")
+        print(f"   ──────────────────────────────────────")
+        print(f"   Цена за единицу:  {item['price_per_unit']:>8.2f} ₽/{item['unit']}")
+        print(f"   Количество:       {item['quantity']:>8.2f} {item['unit']}")
+        print(f"   ──────────────────────────────────────")
+        print(f"   ИТОГО:            {item['total_price']:>8.2f} ₽")
+    
+    print(f"\n{'='*70}")
+    print(f"ВСЕГО К ОПЛАТЕ:      {result1['total_price']:>8.2f} ₽")
+    print(f"Количество позиций:  {len(result1['basket'])}")
+    print(f"{'='*70}")
+
     # ---------------- Тест 2: ужин без молочки ----------------
     print("\n📝 Тест 2: Ужин без молочных продуктов (exclude_tags=['dairy'])")
     
@@ -286,7 +307,7 @@ def test_agent():
         'meal_types': ['dinner'],
         'people': 2,
         'budget_rub': 1200,
-        'exclude_tags': ['meat', 'fish', 'dairy'],
+        #'exclude_tags': ['meat','dairy'],
         'include_tags': ['vegan']
     }
     

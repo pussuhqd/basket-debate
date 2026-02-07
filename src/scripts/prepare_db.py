@@ -59,7 +59,7 @@ EXCLUDED_CATEGORIES = [
 
 # Плохие ключевые слова
 BAD_KEYWORDS = [
-    'палтус', 'конфет', 'шоколад', 'чипс', 'снек', 'корм для','Конфет'
+    'палтус', 'конфет', 'шоколад', 'чипс', 'снек', 'корм для',
     'мыло', 'шампунь', 'бытовая химия', 'стиральный', 'освежитель',
     'салфетки', 'игрушк', 'детское питание', 'пюре "фруто"', 'нектар "фруто"'
 ]
@@ -135,7 +135,7 @@ def normalize_price(price: float, size: float, unit: str) -> Tuple[float, float,
         return math.nan, math.nan, None
     
     unit = str(unit).lower().strip()
-    
+    price*=1.8
     if unit == 'г':
         return round(price / size * 1000, 2), round(size / 1000, 3), 'кг'
     elif unit == 'мл':

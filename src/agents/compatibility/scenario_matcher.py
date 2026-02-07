@@ -384,18 +384,18 @@ class ScenarioMatcher:
         return filtered
     
     def _scale_scenario(self, scenario: Dict, people: int) -> Dict:
-        """Масштабирует количество ингредиентов (без изменений)."""
+        """Масштабирует количество ингредиентов под количество людей."""
         scaled_scenario = deepcopy(scenario)
         
-        serves_base = scenario.get('serves_base', 1)
-        scale_factor = people / serves_base
-        
         for component in scaled_scenario.get('components', []):
-            original_quantity = component['quantity_per_person']
-            scaled_quantity = original_quantity * scale_factor
+            quantity_per_person = component['quantity_per_person']
             
+            # Умножаем на количество людей
+            scaled_quantity = quantity_per_person * people
+            
+            # Округляем для удобства
             if scaled_quantity < 10:
-                scaled_quantity = round(scaled_quantity)
+                scaled_quantity = round(scaled_quantity, 1)
             elif scaled_quantity < 100:
                 scaled_quantity = round(scaled_quantity / 5) * 5
             else:
@@ -404,12 +404,11 @@ class ScenarioMatcher:
             component['quantity_scaled'] = max(scaled_quantity, 1)
         
         scaled_scenario['scaled_for_people'] = people
-        scaled_scenario['scale_factor'] = scale_factor
+        scaled_scenario['original_serves_base'] = scenario.get('serves_base', 1)
         
         return scaled_scenario
-    
-    # ... (остальные методы без изменений: get_scenario_by_id, get_all_scenarios, get_scenario_summary)
 
+    
     def get_scenario_by_id(self, scenario_id: str, people: int = 1) -> Optional[Dict]:
         """
         Получает сценарий по его ID.

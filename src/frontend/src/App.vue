@@ -133,9 +133,24 @@
                 <span v-if="item.brand" class="brand">{{ item.brand }}</span>
               </div>
               
+              <div class="product-pricing">
+                <div class="price-row">
+                  <span class="price-label">Цена за {{ item.unit }}:</span>
+                  <span class="price-value">{{ formatPrice(item.price_per_unit) }}</span>
+                </div>
+                <div class="price-row">
+                  <span class="price-label">Нужно:</span>
+                  <span class="price-value">{{ item.quantity }} {{ item.unit }}</span>
+                </div>
+                <div class="price-row total">
+                  <span class="price-label">Итого:</span>
+                  <span class="price-value big">{{ formatPrice(item.total_price) }} руб</span>
+                </div>
+              </div>
+              
               <div class="product-bottom">
-                <span class="price">{{ formatPrice(item.price) }} ₽</span>
-                <span class="rating">⭐ {{ item.rating || 4.5 }}</span>
+                <span v-if="item.rating" class="rating">⭐ {{ item.rating }}</span>
+                <span v-if="item.search_score" class="score">🎯 {{ (item.search_score * 100).toFixed(0) }}%</span>
               </div>
             </div>
           </div>

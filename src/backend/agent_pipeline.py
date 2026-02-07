@@ -18,6 +18,8 @@ from src.nlp.llm_parser import parse_query_with_function_calling
 from src.schemas.basket_item import BasketItem  
 
 
+# src/backend/agent_pipeline.py
+
 class AgentPipeline:
     """Пайплайн для последовательной обработки запроса агентами."""
     
@@ -57,7 +59,7 @@ class AgentPipeline:
             parsed_query = parse_query_with_function_calling(user_query)
             
             budget_rub = parsed_query.get('budget_rub') or 3000
-            people = parsed_query.get('people') or 1
+            people = parsed_query.get('people') or 2
             meal_types = parsed_query.get('meal_type') or ['dinner']
             
             print(f"   ✅ Распознано: {parsed_query}")
@@ -150,7 +152,7 @@ class AgentPipeline:
             print("\n👤 ЭТАП 4: Profile Agent")
             stage4_start = time.time()
             
-            basket_v3 = basket_current
+            basket_v3 = basket_current  # ✅ Теперь basket_v3 определен!
             
             stages.append({
                 'agent': 'profile',
@@ -164,6 +166,17 @@ class AgentPipeline:
                 }
             })
             
+            formatted_basket = []
+            for item in basket_v3:
+                formatted_item = {
+                    **item,  # Все существующие поля
+                    'price_display': f"{item['price_per_unit']:.2f}₽/{item['unit']}",
+                    'quantity_display': f"{item['quantity']:.2f}{item['unit']}",
+                    'total_display': f"{item['total_price']:.2f}₽",
+                    'breakdown': f"{item['quantity']:.2f}{item['unit']} × {item['price_per_unit']:.2f}₽ = {item['total_price']:.2f}₽"
+                }
+                formatted_basket.append(formatted_item)
+            
             # ============================================
             # ФИНАЛЬНЫЙ РЕЗУЛЬТАТ
             # ============================================
@@ -174,7 +187,7 @@ class AgentPipeline:
             return {
                 'status': 'success',
                 'parsed': parsed_query,
-                'basket': basket_v3,  # List[BasketItem]
+                'basket': formatted_basket,  # ✅ Используем форматированную версию
                 'summary': {
                     'items_count': len(basket_v3),
                     'total_price': round(total_price, 2),
