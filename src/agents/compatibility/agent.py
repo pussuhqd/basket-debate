@@ -6,24 +6,19 @@
 
 from typing import Dict, List, Optional
 from pathlib import Path
-
-
+import json
 from src.agents.compatibility.scenario_matcher import ScenarioMatcher
 from src.agents.compatibility.product_searcher import ProductSearcher
 from src.agents.compatibility.scorer import CompatibilityScorer
 from src.schemas.basket_item import BasketItem, create_basket_item
 
 
-
-# ==================== КОНФИГУРАЦИЯ ====================
-
-
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 SCENARIOS_PATH = PROJECT_ROOT / "data" / "scenarios.json"
+TAG_RULES_PATH = PROJECT_ROOT / "data" / "templates" / "tag_rules_optimized.json"
 
-
-
-# ==================== КЛАСС CompatibilityAgent ====================
+with open(TAG_RULES_PATH, 'r', encoding='utf-8') as f:
+        TAG_KEYWORDS = json.load(f)
 
 
 class CompatibilityAgent:
@@ -49,7 +44,7 @@ class CompatibilityAgent:
         
         # Загружаем компоненты
         self.scenario_matcher = ScenarioMatcher(scenarios_path=scenarios_path)
-        self.searcher = ProductSearcher()  # ✅ БЕЗ db_path
+        self.searcher = ProductSearcher()
         self.scorer = CompatibilityScorer()
         
         print("✅ CompatibilityAgent готов")
@@ -59,7 +54,7 @@ class CompatibilityAgent:
     def generate_basket(
         self,
         parsed_query: Dict,
-        strategy: str = "smart"  # ← Изменили default
+        strategy: str = "smart"  
     ) -> Dict:
         """
         Генерирует корзину товаров с учётом предпочтений пользователя.
@@ -71,15 +66,12 @@ class CompatibilityAgent:
         exclude_tags = parsed_query.get('exclude_tags', [])
         include_tags = parsed_query.get('include_tags', [])
         
-        # ============================================
-        # ШАГ 1: УМНЫЙ выбор сценария
-        # ============================================
         
         max_time_min = parsed_query.get('max_time_min')
         prefer_quick = parsed_query.get('prefer_quick', False)
         prefer_cheap = parsed_query.get('prefer_cheap', False)
         if prefer_cheap == False:
-            prefer_cheap = budget_rub is not None and budget_rub < 1000  # Если бюджет < 1000₽ - ищем дешёвое
+            prefer_cheap = budget_rub is not None and budget_rub < 1500  # Если бюджет < 1000₽ - ищем дешёвое
         
         scenario = self.scenario_matcher.match(
             meal_types=meal_types,

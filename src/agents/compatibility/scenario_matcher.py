@@ -23,8 +23,7 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 import random
 from copy import deepcopy
-
-# ==================== КОНФИГУРАЦИЯ ====================
+from random import randint
 
 SCENARIOS_PATH = Path("data/scenarios.json")
 
@@ -340,8 +339,9 @@ class ScenarioMatcher:
             # Сортируем по убыванию score
             scored_scenarios.sort(key=lambda x: x[1], reverse=True)
             
-            # Берём топ-1
-            selected, best_score = scored_scenarios[0]
+            # Берём топ-1 randomm
+            r_ind = randint(0,min(5,len(scored_scenarios)))
+            selected, best_score = scored_scenarios[r_ind]
             
             print(f"   ⭐ Выбран сценарий с score={best_score:.2f}: {selected['name']}")
         

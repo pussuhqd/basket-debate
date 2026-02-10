@@ -30,6 +30,64 @@ class BudgetAgent:
         self.db_path = db_path
         print("💰 BudgetAgent инициализирован")
     
+    def calculate_total(self, basket: list[dict]) -> float:
+        """
+        Подсчитать общую стоимость корзины.
+        
+        Поддерживает два формата:
+        1. Упрощённый: {"price": 100, "quantity": 2}
+        2. BasketItem: {"price_per_unit": 100, "quantity": 2, "total_price": 200}
+        
+        Args:
+            basket: список товаров
+        
+        Returns:
+            float: общая стоимость в рублях
+        """
+        total = 0.0
+        
+        for item in basket:
+            # Вариант 1: уже есть total_price (BasketItem)
+            if "total_price" in item:
+                total += item["total_price"]
+            
+            # Вариант 2: есть price (упрощённый формат)
+            elif "price" in item:
+                price = item["price"]
+                quantity = item.get("quantity", 1)
+                total += price * quantity
+            
+            # Вариант 3: есть price_per_unit (BasketItem без total_price)
+            elif "price_per_unit" in item:
+                price_per_unit = item["price_per_unit"]
+                quantity = item.get("quantity", 1)
+                total += price_per_unit * quantity
+            
+            else:
+                # Если вообще нет цены - пропускаем товар
+                print(f"⚠️ Товар без цены: {item.get('name', 'unknown')}")
+                continue
+        
+        return round(total, 2)
+
+    
+    
+    # >>>>>>> НОВОЕ: вспомогательный метод <<<<<<<<
+    def check_budget(self, basket: list[dict], budget: float) -> dict:
+        """
+        Проверить, вписывается ли корзина в бюджет (без оптимизации).
+        Это просто удобный helper для тестов и дебага.
+        """
+        total = self.calculate_total(basket)
+        fits = total <= budget
+        overspend = max(0, total - budget)
+        
+        return {
+            "total": total,
+            "budget": budget,
+            "fits": fits,
+            "overspend": round(overspend, 2),
+        }
     
     def optimize(
         self,
